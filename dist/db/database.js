@@ -344,8 +344,9 @@ export async function initDatabase() {
         if (!userColNames.includes('is_admin')) {
             await dbRun('ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0');
         }
-        // Grant admin role to designated system administrator emails
-        await dbRun('UPDATE users SET is_admin = 1 WHERE email IN ("aqeelpay38@gmail.com", "admin@vault.local", "demo.family@vault.local")');
+        // Grant admin role ONLY to official docuvault.app.help@gmail.com
+        await dbRun('UPDATE users SET is_admin = 0');
+        await dbRun('UPDATE users SET is_admin = 1 WHERE email IN ("docuvault.app.help@gmail.com", "admin@docuvault.app")');
     }
     catch (migErr) {
         console.error('Migration check notice:', migErr);

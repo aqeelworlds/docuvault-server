@@ -89,8 +89,9 @@ export async function login(req, res) {
         const profile = await dbGet('SELECT full_name, avatar_url, phone, timezone, app_lock_enabled, app_lock_pin_hash, biometric_enabled FROM profiles WHERE user_id = ?', [user.id]);
         const subscription = await dbGet('SELECT plan_id, status, current_period_end FROM subscriptions WHERE user_id = ?', [user.id]);
         const familyMember = await dbGet('SELECT id, family_group_id FROM family_members WHERE user_id = ?', [user.id]);
-        const isAdmin = Boolean(user.is_admin ||
-            ['aqeelpay38@gmail.com', 'admin@vault.local', 'demo.family@vault.local', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(normalizedEmail));
+        const isAdmin = Boolean((user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app')) ||
+            normalizedEmail === 'docuvault.app.help@gmail.com' ||
+            normalizedEmail === 'admin@docuvault.app');
         const token = generateToken({
             id: user.id,
             email: user.email,
