@@ -75,8 +75,9 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
     }
 
     const isAdmin = Boolean(
-      user.is_admin ||
-      ['aqeelpay38@gmail.com', 'admin@vault.local', 'demo.family@vault.local', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(user.email.toLowerCase())
+      (user.is_admin && (user.email.toLowerCase() === 'docuvault.app.help@gmail.com' || user.email.toLowerCase() === 'admin@docuvault.app')) ||
+      user.email.toLowerCase() === 'docuvault.app.help@gmail.com' ||
+      user.email.toLowerCase() === 'admin@docuvault.app'
     );
 
     req.user = {
@@ -110,7 +111,7 @@ export async function requireAdmin(req: AuthenticatedRequest, res: Response, nex
     [req.user.id]
   );
 
-  const isAdminEmail = ['aqeelpay38@gmail.com', 'admin@vault.local', 'demo.family@vault.local', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(user?.email?.toLowerCase() || '');
+  const isAdminEmail = user?.email?.toLowerCase() === 'docuvault.app.help@gmail.com' || user?.email?.toLowerCase() === 'admin@docuvault.app';
 
   if (!user || (!user.is_admin && !isAdminEmail)) {
     res.status(403).json({ error: 'Access denied: Administrator privileges required', code: 'ADMIN_REQUIRED' });

@@ -154,8 +154,9 @@ export async function login(req: Request, res: Response): Promise<void> {
     );
 
     const isAdmin = Boolean(
-      user.is_admin ||
-      ['aqeelpay38@gmail.com', 'admin@vault.local', 'demo.family@vault.local', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(normalizedEmail)
+      (user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app')) ||
+      normalizedEmail === 'docuvault.app.help@gmail.com' ||
+      normalizedEmail === 'admin@docuvault.app'
     );
 
     const token = generateToken({
