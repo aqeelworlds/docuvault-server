@@ -8,7 +8,7 @@ import { ensureFreshData, queueCloudSync } from '../db/cloudSync.js';
  */
 export async function getAdminStats(req, res) {
     try {
-        await ensureFreshData();
+        await ensureFreshData(true);
         const totalUsersRow = await dbGet('SELECT COUNT(*) as count FROM users');
         const totalDocsRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0');
         const totalArchivedRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1');
@@ -78,7 +78,7 @@ export async function getAdminStats(req, res) {
  */
 export async function getAllUsers(req, res) {
     try {
-        await ensureFreshData();
+        await ensureFreshData(true);
         const q = (req.query.q || '').toLowerCase().trim();
         const planFilter = req.query.plan;
         let sql = `

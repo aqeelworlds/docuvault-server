@@ -134,10 +134,10 @@ export function queueCloudSync() {
         pushCloudDatabase().catch(() => { });
     }, 1000);
 }
-export async function ensureFreshData() {
+export async function ensureFreshData(force = false) {
     const now = Date.now();
-    // If not pulled in the last 15 seconds, refresh from cloud
-    if (now - lastPullTimestamp > 15000) {
+    // Force sync or if 3 seconds have passed
+    if (force || now - lastPullTimestamp > 3000) {
         await pullCloudDatabase();
     }
 }
