@@ -3,12 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { dbGet, dbRun, dbAll, DB_PATH } from '../db/database.js';
 import { AuthenticatedRequest, hashPassword } from '../middleware/auth.js';
+import { ensureFreshData, queueCloudSync } from '../db/cloudSync.js';
 
 /**
  * Overview statistics for Admin Dashboard.
  */
 export async function getAdminStats(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
+    await ensureFreshData();
     const totalUsersRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM users');
     const totalDocsRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0');
     const totalArchivedRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1');
@@ -88,6 +90,7 @@ export async function getAdminStats(req: AuthenticatedRequest, res: Response): P
  */
 export async function getAllUsers(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
+    await ensureFreshData();
     const q = (req.query.q as string || '').toLowerCase().trim();
     const planFilter = req.query.plan as string;
 
@@ -194,6 +197,8 @@ export async function updateUserSubscription(req: AuthenticatedRequest, res: Res
       [uuidv4(), targetUserId, 'UPDATED', `Admin updated plan to ${planId} (${subStatus})`]
     );
 
+    queueCloudSync();
+
     res.json({
       message: `User subscription updated to ${planId} successfully`,
       planId,
@@ -225,6 +230,8 @@ export async function resetUserPassword(req: AuthenticatedRequest, res: Response
       [hash, salt, targetUserId]
     );
 
+    queueCloudSync();
+
     res.json({ message: 'User password reset successfully' });
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to reset password', details: error.message });
@@ -251,6 +258,8 @@ export async function updateUserProfile(req: AuthenticatedRequest, res: Response
     if (isAdmin !== undefined) {
       await dbRun('UPDATE users SET is_admin = ? WHERE id = ?', [isAdmin ? 1 : 0, targetUserId]);
     }
+
+    queueCloudSync();
 
     res.json({ message: 'User profile updated successfully by admin' });
   } catch (error: any) {

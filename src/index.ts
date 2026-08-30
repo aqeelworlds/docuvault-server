@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import apiRouter from './routes/api.js';
 import { initDatabase } from './db/database.js';
 import { seedDemoData } from './db/seed.js';
+import { pullCloudDatabase, ensureFreshData } from './db/cloudSync.js';
 
 dotenv.config();
 
@@ -34,6 +35,14 @@ app.use(cors({
 
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// Ensure fresh data on serverless cold starts
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  try {
+    await ensureFreshData();
+  } catch {}
+  next();
+});
 
 // Health Check
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -72,6 +81,7 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 async function bootstrap() {
   try {
     await initDatabase();
+    await pullCloudDatabase();
     await seedDemoData();
     app.listen(PORT, () => {
       console.log(`🚀 Document Vault Server running at http://localhost:${PORT}`);

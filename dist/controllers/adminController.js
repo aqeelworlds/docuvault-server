@@ -2,11 +2,13 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { dbGet, dbRun, dbAll, DB_PATH } from '../db/database.js';
 import { hashPassword } from '../middleware/auth.js';
+import { ensureFreshData, queueCloudSync } from '../db/cloudSync.js';
 /**
  * Overview statistics for Admin Dashboard.
  */
 export async function getAdminStats(req, res) {
     try {
+        await ensureFreshData();
         const totalUsersRow = await dbGet('SELECT COUNT(*) as count FROM users');
         const totalDocsRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0');
         const totalArchivedRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1');
@@ -76,6 +78,7 @@ export async function getAdminStats(req, res) {
  */
 export async function getAllUsers(req, res) {
     try {
+        await ensureFreshData();
         const q = (req.query.q || '').toLowerCase().trim();
         const planFilter = req.query.plan;
         let sql = `
@@ -163,6 +166,7 @@ export async function updateUserSubscription(req, res) {
             await dbRun('INSERT INTO subscriptions (id, user_id, plan_id, status, current_period_end, payment_provider) VALUES (?, ?, ?, ?, ?, "ADMIN_OVERRIDE")', [uuidv4(), targetUserId, planId, subStatus, periodEnd]);
         }
         await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), targetUserId, 'UPDATED', `Admin updated plan to ${planId} (${subStatus})`]);
+        queueCloudSync();
         res.json({
             message: `User subscription updated to ${planId} successfully`,
             planId,
@@ -187,6 +191,7 @@ export async function resetUserPassword(req, res) {
         }
         const { hash, salt } = await hashPassword(newPassword);
         await dbRun('UPDATE users SET password_hash = ?, salt = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [hash, salt, targetUserId]);
+        queueCloudSync();
         res.json({ message: 'User password reset successfully' });
     }
     catch (error) {
@@ -212,6 +217,7 @@ export async function updateUserProfile(req, res) {
         if (isAdmin !== undefined) {
             await dbRun('UPDATE users SET is_admin = ? WHERE id = ?', [isAdmin ? 1 : 0, targetUserId]);
         }
+        queueCloudSync();
         res.json({ message: 'User profile updated successfully by admin' });
     }
     catch (error) {

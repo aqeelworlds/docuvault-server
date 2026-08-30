@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { dbGet, dbRun, dbAll, VAULT_DIR } from '../db/database.js';
 import { hashPassword, verifyPassword, generateToken, hashPin } from '../middleware/auth.js';
 import { sendPasswordResetOtp, sendSupportInquiry } from '../services/emailService.js';
+import { queueCloudSync } from '../db/cloudSync.js';
 import fs from 'fs';
 import path from 'path';
 export async function register(req, res) {
@@ -47,6 +48,8 @@ export async function register(req, res) {
         // Record activity
         await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'CREATED', 'Document Vault account created']);
         const token = generateToken({ id: userId, email: normalizedEmail, fullName: fullName.trim() });
+        // Sync to GitHub Cloud in background
+        queueCloudSync();
         res.status(201).json({
             message: 'Account created successfully',
             token,
@@ -86,6 +89,9 @@ export async function login(req, res) {
             res.status(401).json({ error: 'Invalid email or password' });
             return;
         }
+        // Update last login timestamp and queue sync
+        await dbRun('UPDATE users SET last_login_at = ? WHERE id = ?', [new Date().toISOString(), user.id]);
+        queueCloudSync();
         const profile = await dbGet('SELECT full_name, avatar_url, phone, timezone, app_lock_enabled, app_lock_pin_hash, biometric_enabled FROM profiles WHERE user_id = ?', [user.id]);
         const subscription = await dbGet('SELECT plan_id, status, current_period_end FROM subscriptions WHERE user_id = ?', [user.id]);
         const familyMember = await dbGet('SELECT id, family_group_id FROM family_members WHERE user_id = ?', [user.id]);
