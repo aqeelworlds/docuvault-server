@@ -23,11 +23,13 @@ const BUNDLED_STORAGE_DIR = path.resolve(__dirname, '../../storage');
 const BUNDLED_DB_PATH = path.resolve(BUNDLED_STORAGE_DIR, 'document_vault.db');
 
 export const STORAGE_DIR = isServerless
-  ? path.resolve(os.tmpdir(), 'docuvault_storage')
+  ? os.tmpdir()
   : BUNDLED_STORAGE_DIR;
 
-export const VAULT_DIR = path.resolve(STORAGE_DIR, 'vault');
-export const DB_PATH = path.resolve(STORAGE_DIR, 'document_vault.db');
+export const VAULT_DIR = path.resolve(STORAGE_DIR, 'docuvault_vault');
+export const DB_PATH = isServerless
+  ? path.resolve(os.tmpdir(), 'docuvault.db')
+  : path.resolve(STORAGE_DIR, 'document_vault.db');
 
 // Ensure directories exist
 try {
@@ -43,7 +45,7 @@ try {
     try {
       fs.copyFileSync(BUNDLED_DB_PATH, DB_PATH);
       try { fs.chmodSync(DB_PATH, 0o666); } catch {}
-      console.log('[DocuVault DB] Copied bundled database to writable /tmp storage and set permissions.');
+      console.log('[DocuVault DB] Copied bundled database to /tmp/docuvault.db successfully.');
     } catch (copyErr) {
       console.warn('[DocuVault DB] Could not copy bundled DB to /tmp, will initialize freshly:', copyErr);
     }
@@ -62,6 +64,9 @@ export function getDb(): sqlite3.Database {
       if (err) {
         console.error('[DocuVault DB] Failed to open SQLite database at', DB_PATH, err);
       } else {
+        dbInstance?.run('PRAGMA journal_mode = MEMORY');
+        dbInstance?.run('PRAGMA temp_store = MEMORY');
+        dbInstance?.run('PRAGMA synchronous = OFF');
         console.log('[DocuVault DB] Successfully connected to SQLite at', DB_PATH);
       }
     });
