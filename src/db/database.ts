@@ -8,49 +8,35 @@ const __dirname = path.dirname(__filename);
 
 import os from 'os';
 
-const isServerless = Boolean(
-  process.env.VERCEL ||
-  process.env.VERCEL_ENV ||
-  process.env.AWS_LAMBDA_FUNCTION_NAME ||
-  process.env.LAMBDA_TASK_ROOT ||
-  process.env.NOW_REGION ||
-  process.env.NODE_ENV === 'production' ||
-  __dirname.includes('/var/task') ||
-  __dirname.includes('\\var\\task')
-);
-
 const BUNDLED_STORAGE_DIR = path.resolve(__dirname, '../../storage');
-const BUNDLED_DB_PATH = path.resolve(BUNDLED_STORAGE_DIR, 'document_vault.db');
+
+const isBundledWritable = () => {
+  try {
+    const testFile = path.resolve(BUNDLED_STORAGE_DIR, '.w_test_' + Date.now());
+    fs.writeFileSync(testFile, '1');
+    fs.unlinkSync(testFile);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const isServerless = !isBundledWritable();
 
 export const STORAGE_DIR = isServerless
-  ? os.tmpdir()
+  ? path.resolve(os.tmpdir(), 'docuvault_data')
   : BUNDLED_STORAGE_DIR;
 
-export const VAULT_DIR = path.resolve(STORAGE_DIR, 'docuvault_vault');
-export const DB_PATH = isServerless
-  ? path.resolve(os.tmpdir(), 'docuvault.db')
-  : path.resolve(STORAGE_DIR, 'document_vault.db');
+export const VAULT_DIR = path.resolve(STORAGE_DIR, 'vault');
+export const DB_PATH = path.resolve(STORAGE_DIR, 'document_vault.db');
 
-// Ensure directories exist
+// Ensure directories exist with full read-write permissions
 try {
   if (!fs.existsSync(STORAGE_DIR)) {
     fs.mkdirSync(STORAGE_DIR, { recursive: true, mode: 0o777 });
   }
   if (!fs.existsSync(VAULT_DIR)) {
     fs.mkdirSync(VAULT_DIR, { recursive: true, mode: 0o777 });
-  }
-
-  // If in serverless and tmp DB doesn't exist yet, copy initial bundled DB if available
-  if (isServerless && !fs.existsSync(DB_PATH) && fs.existsSync(BUNDLED_DB_PATH)) {
-    try {
-      fs.copyFileSync(BUNDLED_DB_PATH, DB_PATH);
-      try { fs.chmodSync(DB_PATH, 0o666); } catch {}
-      console.log('[DocuVault DB] Copied bundled database to /tmp/docuvault.db successfully.');
-    } catch (copyErr) {
-      console.warn('[DocuVault DB] Could not copy bundled DB to /tmp, will initialize freshly:', copyErr);
-    }
-  } else if (isServerless && fs.existsSync(DB_PATH)) {
-    try { fs.chmodSync(DB_PATH, 0o666); } catch {}
   }
 } catch (e) {
   console.warn('[DocuVault DB] Error ensuring storage directories:', e);

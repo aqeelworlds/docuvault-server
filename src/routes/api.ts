@@ -85,6 +85,46 @@ import { uploadAttachment } from '../middleware/upload.js';
 
 const router = Router();
 
+import { DB_PATH, STORAGE_DIR, dbRun, dbGet } from '../db/database.js';
+
+router.get('/health', (_req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'Document Vault Backend API',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+router.get('/debug-db', async (_req, res) => {
+  try {
+    await dbRun('CREATE TABLE IF NOT EXISTS _test_write (id TEXT, created_at TEXT)');
+    await dbRun('INSERT INTO _test_write VALUES (?, ?)', ['test_' + Date.now(), new Date().toISOString()]);
+    const userCount = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM users');
+    res.json({
+      success: true,
+      dbPath: DB_PATH,
+      storageDir: STORAGE_DIR,
+      userCount: userCount?.count || 0,
+      env: {
+        VERCEL: process.env.VERCEL,
+        NODE_ENV: process.env.NODE_ENV
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      dbPath: DB_PATH,
+      storageDir: STORAGE_DIR,
+      env: {
+        VERCEL: process.env.VERCEL,
+        NODE_ENV: process.env.NODE_ENV
+      }
+    });
+  }
+});
+
 // --- AUTHENTICATION & PROFILE ---
 router.post('/auth/register', register);
 router.post('/auth/login', login);
