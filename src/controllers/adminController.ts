@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { dbGet, dbRun, dbAll, DB_PATH } from '../db/database.js';
 import { AuthenticatedRequest, hashPassword } from '../middleware/auth.js';
-import { ensureFreshData, queueCloudSync } from '../db/cloudSync.js';
+import { ensureFreshData, queueCloudSync, syncToCloudNow } from '../db/cloudSync.js';
 
 /**
  * Overview statistics for Admin Dashboard.
@@ -197,7 +197,9 @@ export async function updateUserSubscription(req: AuthenticatedRequest, res: Res
       [uuidv4(), targetUserId, 'UPDATED', `Admin updated plan to ${planId} (${subStatus})`]
     );
 
-    queueCloudSync();
+    try {
+      await syncToCloudNow();
+    } catch {}
 
     res.json({
       message: `User subscription updated to ${planId} successfully`,
@@ -230,7 +232,9 @@ export async function resetUserPassword(req: AuthenticatedRequest, res: Response
       [hash, salt, targetUserId]
     );
 
-    queueCloudSync();
+    try {
+      await syncToCloudNow();
+    } catch {}
 
     res.json({ message: 'User password reset successfully' });
   } catch (error: any) {
@@ -259,7 +263,9 @@ export async function updateUserProfile(req: AuthenticatedRequest, res: Response
       await dbRun('UPDATE users SET is_admin = ? WHERE id = ?', [isAdmin ? 1 : 0, targetUserId]);
     }
 
-    queueCloudSync();
+    try {
+      await syncToCloudNow();
+    } catch {}
 
     res.json({ message: 'User profile updated successfully by admin' });
   } catch (error: any) {
@@ -281,6 +287,10 @@ export async function deleteUserByAdmin(req: AuthenticatedRequest, res: Response
     }
 
     await dbRun('DELETE FROM users WHERE id = ?', [targetUserId]);
+
+    try {
+      await syncToCloudNow();
+    } catch {}
 
     res.json({ message: 'User and all associated data permanently deleted by admin' });
   } catch (error: any) {

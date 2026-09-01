@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { dbGet, dbRun, dbAll, VAULT_DIR } from '../db/database.js';
 import { hashPassword, verifyPassword, generateToken, hashPin } from '../middleware/auth.js';
 import { sendPasswordResetOtp, sendSupportInquiry } from '../services/emailService.js';
-import { queueCloudSync } from '../db/cloudSync.js';
+import { queueCloudSync, syncToCloudNow } from '../db/cloudSync.js';
 import fs from 'fs';
 import path from 'path';
 export async function register(req, res) {
@@ -48,8 +48,13 @@ export async function register(req, res) {
         // Record activity
         await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'CREATED', 'Document Vault account created']);
         const token = generateToken({ id: userId, email: normalizedEmail, fullName: fullName.trim() });
-        // Sync to GitHub Cloud in background
-        queueCloudSync();
+        // Sync to GitHub Cloud synchronously for serverless persistence
+        try {
+            await syncToCloudNow();
+        }
+        catch (syncErr) {
+            console.warn('Sync error on register:', syncErr);
+        }
         res.status(201).json({
             message: 'Account created successfully',
             token,

@@ -75,6 +75,8 @@ export async function initDatabase() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       salt TEXT NOT NULL,
+      is_admin INTEGER DEFAULT 0,
+      last_login_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -216,9 +218,12 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS subscriptions (
       id TEXT PRIMARY KEY,
       user_id TEXT UNIQUE NOT NULL,
-      plan_id TEXT DEFAULT 'FREE', -- 'FREE', 'PRO_MONTHLY', 'PRO_YEARLY'
+      plan_id TEXT DEFAULT 'FREE', -- 'FREE', 'PRO_MONTHLY', 'PRO_YEARLY', 'PRO_LIFETIME'
       status TEXT DEFAULT 'ACTIVE', -- 'ACTIVE', 'EXPIRED', 'TRIAL'
+      payment_provider TEXT DEFAULT 'DIRECT',
+      current_period_start TEXT,
       current_period_end TEXT,
+      cancel_at_period_end INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -343,6 +348,15 @@ export async function initDatabase() {
         const userColNames = userInfo.map(c => c.name);
         if (!userColNames.includes('is_admin')) {
             await dbRun('ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0');
+        }
+        if (!userColNames.includes('last_login_at')) {
+            await dbRun('ALTER TABLE users ADD COLUMN last_login_at DATETIME');
+        }
+        if (!subColNames.includes('current_period_start')) {
+            await dbRun('ALTER TABLE subscriptions ADD COLUMN current_period_start TEXT');
+        }
+        if (!subColNames.includes('cancel_at_period_end')) {
+            await dbRun('ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end INTEGER DEFAULT 0');
         }
         // Grant admin role ONLY to official docuvault.app.help@gmail.com
         await dbRun('UPDATE users SET is_admin = 0');

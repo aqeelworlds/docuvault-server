@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { dbGet, dbRun, dbAll, VAULT_DIR } from '../db/database.js';
 import { hashPassword, verifyPassword, generateToken, hashPin, AuthenticatedRequest } from '../middleware/auth.js';
 import { sendPasswordResetOtp, sendSupportInquiry } from '../services/emailService.js';
-import { queueCloudSync } from '../db/cloudSync.js';
+import { queueCloudSync, syncToCloudNow, ensureFreshData } from '../db/cloudSync.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -87,8 +87,12 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     const token = generateToken({ id: userId, email: normalizedEmail, fullName: fullName.trim() });
 
-    // Sync to GitHub Cloud in background
-    queueCloudSync();
+    // Sync to GitHub Cloud synchronously for serverless persistence
+    try {
+      await syncToCloudNow();
+    } catch (syncErr) {
+      console.warn('Sync error on register:', syncErr);
+    }
 
     res.status(201).json({
       message: 'Account created successfully',
