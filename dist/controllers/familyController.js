@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { dbGet, dbRun, dbAll } from '../db/database.js';
 import { calculateExpiryMetrics } from '../services/expiryService.js';
 import { checkUserIsPro } from './subscriptionController.js';
+import { ensureFreshData, syncToCloudNow } from '../db/cloudSync.js';
 export async function getFamilyGroup(req, res) {
     try {
         const userId = req.user.id;
@@ -166,10 +167,10 @@ export async function addFamilyMember(req, res) {
         // Count existing members
         const countRow = await dbGet('SELECT COUNT(*) as count FROM family_members WHERE family_group_id = ?', [selfMember.family_group_id]);
         const memberCount = countRow?.count || 1;
-        // Free plan allows only the single primary user; adding additional family members is a Pro feature
-        if (!isPro && memberCount >= 1) {
+        // Free plan allows owner + up to 2 family members (total 3 members in group)
+        if (!isPro && memberCount >= 3) {
             res.status(403).json({
-                error: 'Adding family members and family sharing requires Document Vault Pro.',
+                error: 'Free plan includes up to 2 family members. Upgrade to Document Vault Pro for unlimited family sharing.',
                 code: 'FAMILY_PRO_REQUIRED'
             });
             return;
@@ -177,11 +178,14 @@ export async function addFamilyMember(req, res) {
         const memberId = uuidv4();
         const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#14b8a6'];
         const selectedColor = avatarColor || colors[Math.floor(Math.random() * colors.length)];
-        let invitationId = null;
-        let memberStatus = 'ACTIVE';
+        let invitationId = uuidv4();
+        const inviteCode = 'FAM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        let memberStatus = email ? 'PENDING' : 'ACTIVE';
         let targetUserId = null;
+        let normalizedEmail = null;
         if (email && typeof email === 'string' && email.includes('@')) {
-            const normalizedEmail = email.toLowerCase().trim();
+            normalizedEmail = email.toLowerCase().trim();
             // Check if user already exists in this family group
             const existingInFamily = await dbGet('SELECT id FROM family_members WHERE family_group_id = ? AND (email = ? OR user_id IN (SELECT id FROM users WHERE email = ?))', [selfMember.family_group_id, normalizedEmail, normalizedEmail]);
             if (existingInFamily) {
@@ -190,53 +194,50 @@ export async function addFamilyMember(req, res) {
             }
             const existingUser = await dbGet('SELECT id FROM users WHERE email = ?', [normalizedEmail]);
             targetUserId = existingUser?.id || null;
-            invitationId = uuidv4();
-            const inviteCode = 'FAM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-            const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-            memberStatus = 'PENDING';
-            // Insert into family_invitations
-            await dbRun(`INSERT INTO family_invitations (
-          id, family_group_id, invited_by_user_id, invitee_email, invitee_user_id,
-          invite_code, relationship, role, status, expires_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`, [
-                invitationId,
-                selfMember.family_group_id,
-                userId,
-                normalizedEmail,
-                targetUserId,
-                inviteCode,
-                relationship.trim(),
-                role || 'MEMBER',
-                expiresAt
-            ]);
-            await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'SHARED', `Sent family invitation to ${normalizedEmail} (${name.trim()})`]);
         }
+        // Always create a pending family invitation code so the member can join anytime
+        await dbRun(`INSERT INTO family_invitations (
+        id, family_group_id, invited_by_user_id, invitee_email, invitee_user_id,
+        invite_code, relationship, role, status, expires_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`, [
+            invitationId,
+            selfMember.family_group_id,
+            userId,
+            normalizedEmail || `${name.trim().toLowerCase().replace(/\s+/g, '_')}@family.local`,
+            targetUserId,
+            inviteCode,
+            relationship.trim(),
+            role || 'MEMBER',
+            expiresAt
+        ]);
         await dbRun(`INSERT INTO family_members (id, family_group_id, user_id, name, email, relationship, role, avatar_color, status, invitation_id)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
             memberId,
             selfMember.family_group_id,
             targetUserId,
             name.trim(),
-            email ? email.toLowerCase().trim() : null,
+            normalizedEmail,
             relationship.trim(),
             role || 'MEMBER',
             selectedColor,
             memberStatus,
             invitationId
         ]);
-        const inv = invitationId ? await dbGet('SELECT invite_code FROM family_invitations WHERE id = ?', [invitationId]) : null;
+        await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'SHARED', `Added family member ${name.trim()} (${relationship.trim()})`]);
+        // Synchronize to cloud immediately
+        await syncToCloudNow();
         res.status(201).json({
             message: email
-                ? `Family member added and invitation sent to ${email.trim()}!`
-                : `Family vault profile for ${name.trim()} created successfully!`,
+                ? `Family member added and invitation code ${inviteCode} generated for ${email.trim()}!`
+                : `Family vault member ${name.trim()} added successfully! Invite Code: ${inviteCode}`,
             memberId,
             status: memberStatus,
             invitationId,
-            inviteCode: inv?.invite_code || null,
+            inviteCode,
             isLocalProfile: !email,
             name: name.trim(),
             relationship: relationship.trim(),
-            email: email ? email.trim() : null
+            email: normalizedEmail
         });
     }
     catch (error) {
@@ -246,6 +247,7 @@ export async function addFamilyMember(req, res) {
 }
 export async function joinFamilyByCode(req, res) {
     try {
+        await ensureFreshData(true);
         const userId = req.user.id;
         const userEmail = req.user.email;
         const userName = req.user.fullName;
@@ -255,10 +257,13 @@ export async function joinFamilyByCode(req, res) {
             return;
         }
         const cleanCode = code.trim().toUpperCase();
-        // Check invitation by code or ID
-        const invitation = await dbGet('SELECT fi.*, fg.name as family_name FROM family_invitations fi JOIN family_groups fg ON fi.family_group_id = fg.id WHERE (fi.id = ? OR fi.invite_code = ?) AND fi.status = "PENDING"', [cleanCode, cleanCode]);
+        // Check invitation by code or ID (case-insensitive)
+        const invitation = await dbGet(`SELECT fi.*, fg.name as family_name 
+       FROM family_invitations fi 
+       JOIN family_groups fg ON fi.family_group_id = fg.id 
+       WHERE (UPPER(fi.invite_code) = ? OR UPPER(fi.id) = ?) AND fi.status = 'PENDING'`, [cleanCode, cleanCode]);
         if (!invitation) {
-            res.status(404).json({ error: 'Invalid or expired invite code' });
+            res.status(404).json({ error: 'Invalid or expired invitation code. Please check with your family vault owner.' });
             return;
         }
         if (new Date(invitation.expires_at).getTime() < Date.now()) {
@@ -266,9 +271,9 @@ export async function joinFamilyByCode(req, res) {
             return;
         }
         // Check if member row already existed for this invitation
-        const existingMember = await dbGet('SELECT id FROM family_members WHERE invitation_id = ? OR (family_group_id = ? AND email = ?)', [invitation.id, invitation.family_group_id, userEmail.toLowerCase()]);
+        const existingMember = await dbGet('SELECT id FROM family_members WHERE invitation_id = ? OR (family_group_id = ? AND (LOWER(email) = ? OR user_id = ?))', [invitation.id, invitation.family_group_id, userEmail.toLowerCase(), userId]);
         if (existingMember) {
-            await dbRun('UPDATE family_members SET user_id = ?, name = ?, status = "ACTIVE" WHERE id = ?', [userId, userName || 'Family Member', existingMember.id]);
+            await dbRun('UPDATE family_members SET user_id = ?, name = ?, email = ?, status = "ACTIVE" WHERE id = ?', [userId, userName || 'Family Member', userEmail.toLowerCase(), existingMember.id]);
         }
         else {
             const memberId = uuidv4();
@@ -285,9 +290,11 @@ export async function joinFamilyByCode(req, res) {
             ]);
         }
         // Update invitation status
-        await dbRun('UPDATE family_invitations SET status = "ACCEPTED", invitee_user_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [userId, invitation.id]);
-        await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'UPDATED', `Joined ${invitation.family_name} using invite code`]);
-        res.json({ message: `Successfully joined ${invitation.family_name}!` });
+        await dbRun('UPDATE family_invitations SET status = "ACCEPTED", invitee_user_id = ?, invitee_email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [userId, userEmail.toLowerCase(), invitation.id]);
+        await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'UPDATED', `Joined ${invitation.family_name} via invite code`]);
+        // Sync cloud database immediately
+        await syncToCloudNow();
+        res.json({ message: `Successfully joined ${invitation.family_name}!`, familyName: invitation.family_name });
     }
     catch (error) {
         console.error('joinFamilyByCode error:', error);
@@ -341,6 +348,7 @@ export async function deleteFamilyMember(req, res) {
         }
         // Remove member row
         await dbRun('DELETE FROM family_members WHERE id = ? AND family_group_id = ?', [memberId, selfMember.family_group_id]);
+        await syncToCloudNow();
         res.json({ message: 'Family member removed successfully' });
     }
     catch (error) {
@@ -360,28 +368,40 @@ export async function inviteFamilyMember(req, res) {
             res.status(403).json({ error: 'Only family owners and admins can send invitations' });
             return;
         }
+        const isPro = await checkUserIsPro(userId);
+        const countRow = await dbGet('SELECT COUNT(*) as count FROM family_members WHERE family_group_id = ?', [selfMember.family_group_id]);
+        const memberCount = countRow?.count || 1;
+        if (!isPro && memberCount >= 3) {
+            res.status(403).json({
+                error: 'Free plan includes up to 2 family members. Upgrade to Document Vault Pro for unlimited family sharing.',
+                code: 'FAMILY_PRO_REQUIRED'
+            });
+            return;
+        }
         // Check if invitee is already in this family
         const normalizedEmail = email.toLowerCase().trim();
         const existingUser = await dbGet('SELECT u.id, p.full_name FROM users u LEFT JOIN profiles p ON u.id = p.user_id WHERE u.email = ?', [normalizedEmail]);
         if (existingUser) {
-            const alreadyMember = await dbGet('SELECT id FROM family_members WHERE family_group_id = ? AND user_id = ?', [selfMember.family_group_id, existingUser.id]);
+            const alreadyMember = await dbGet('SELECT id FROM family_members WHERE family_group_id = ? AND (user_id = ? OR email = ?)', [selfMember.family_group_id, existingUser.id, normalizedEmail]);
             if (alreadyMember) {
                 res.status(400).json({ error: 'This user is already a member of your family group' });
                 return;
             }
         }
-        // Create Invitation (7-day expiry)
+        // Create Invitation (30-day expiry)
         const invitationId = uuidv4();
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const inviteCode = 'FAM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         await dbRun(`INSERT INTO family_invitations (
         id, family_group_id, invited_by_user_id, invitee_email, invitee_user_id,
-        relationship, role, status, expires_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`, [
+        invite_code, relationship, role, status, expires_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`, [
             invitationId,
             selfMember.family_group_id,
             userId,
             normalizedEmail,
             existingUser?.id || null,
+            inviteCode,
             relationship || 'Family Member',
             role || 'MEMBER',
             expiresAt
@@ -398,9 +418,11 @@ export async function inviteFamilyMember(req, res) {
             role || 'MEMBER',
             invitationId
         ]);
+        await syncToCloudNow();
         res.status(201).json({
-            message: `Invitation sent to ${email}`,
+            message: `Invitation sent to ${email} (Invite Code: ${inviteCode})`,
             invitationId,
+            inviteCode,
             expiresAt
         });
     }
@@ -461,6 +483,7 @@ export async function acceptInvitation(req, res) {
         // Update invitation status
         await dbRun('UPDATE family_invitations SET status = "ACCEPTED", invitee_user_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [userId, invitationId]);
         await dbRun('INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)', [uuidv4(), userId, 'UPDATED', `Accepted family invitation from ${invitation.invited_by_user_id}`]);
+        await syncToCloudNow();
         res.json({ message: 'Invitation accepted! You have joined the family vault.' });
     }
     catch (error) {
@@ -474,6 +497,7 @@ export async function rejectInvitation(req, res) {
         const userEmail = req.user.email;
         await dbRun('UPDATE family_invitations SET status = "REJECTED", updated_at = CURRENT_TIMESTAMP WHERE id = ? AND invitee_email = ?', [invitationId, userEmail.toLowerCase()]);
         await dbRun('UPDATE family_members SET status = "REJECTED" WHERE invitation_id = ?', [invitationId]);
+        await syncToCloudNow();
         res.json({ message: 'Invitation declined' });
     }
     catch (error) {
@@ -491,6 +515,7 @@ export async function cancelInvitation(req, res) {
         }
         await dbRun('UPDATE family_invitations SET status = "CANCELLED", updated_at = CURRENT_TIMESTAMP WHERE id = ? AND family_group_id = ?', [invitationId, selfMember.family_group_id]);
         await dbRun('DELETE FROM family_members WHERE invitation_id = ? AND status = "PENDING"', [invitationId]);
+        await syncToCloudNow();
         res.json({ message: 'Invitation cancelled successfully' });
     }
     catch (error) {
@@ -521,6 +546,7 @@ export async function leaveFamily(req, res) {
         await dbRun('DELETE FROM document_permissions WHERE shared_with_member_id = ? OR granted_by_user_id = ?', [member.id, userId]);
         // Remove membership
         await dbRun('DELETE FROM family_members WHERE id = ?', [member.id]);
+        await syncToCloudNow();
         res.json({ message: 'You have left the family group' });
     }
     catch (error) {
@@ -543,6 +569,7 @@ export async function deleteFamilyGroup(req, res) {
         await dbRun('DELETE FROM family_members WHERE family_group_id = ? AND user_id != ?', [selfMember.family_group_id, userId]);
         // Delete family group record
         await dbRun('DELETE FROM family_groups WHERE id = ?', [selfMember.family_group_id]);
+        await syncToCloudNow();
         res.json({ message: 'Family group deleted successfully' });
     }
     catch (error) {
