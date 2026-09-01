@@ -4,20 +4,48 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const STORAGE_DIR = path.resolve(__dirname, '../../storage');
-const VAULT_DIR = path.resolve(STORAGE_DIR, 'vault');
-const DB_PATH = path.resolve(STORAGE_DIR, 'document_vault.db');
+import os from 'os';
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT || process.env.NODE_ENV === 'production' && !fs.existsSync(path.resolve(__dirname, '../../storage/document_vault.db')));
+const BUNDLED_STORAGE_DIR = path.resolve(__dirname, '../../storage');
+const BUNDLED_DB_PATH = path.resolve(BUNDLED_STORAGE_DIR, 'document_vault.db');
+export const STORAGE_DIR = isServerless
+    ? path.resolve(os.tmpdir(), 'docuvault_storage')
+    : BUNDLED_STORAGE_DIR;
+export const VAULT_DIR = path.resolve(STORAGE_DIR, 'vault');
+export const DB_PATH = path.resolve(STORAGE_DIR, 'document_vault.db');
 // Ensure directories exist
-if (!fs.existsSync(STORAGE_DIR)) {
-    fs.mkdirSync(STORAGE_DIR, { recursive: true });
+try {
+    if (!fs.existsSync(STORAGE_DIR)) {
+        fs.mkdirSync(STORAGE_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(VAULT_DIR)) {
+        fs.mkdirSync(VAULT_DIR, { recursive: true });
+    }
+    // If in serverless and tmp DB doesn't exist yet, copy initial bundled DB if available
+    if (isServerless && !fs.existsSync(DB_PATH) && fs.existsSync(BUNDLED_DB_PATH)) {
+        try {
+            fs.copyFileSync(BUNDLED_DB_PATH, DB_PATH);
+            console.log('[DocuVault DB] Copied bundled database to writable /tmp storage successfully.');
+        }
+        catch (copyErr) {
+            console.warn('[DocuVault DB] Could not copy bundled DB to /tmp, will initialize freshly:', copyErr);
+        }
+    }
 }
-if (!fs.existsSync(VAULT_DIR)) {
-    fs.mkdirSync(VAULT_DIR, { recursive: true });
+catch (e) {
+    console.warn('[DocuVault DB] Error ensuring storage directories:', e);
 }
 let dbInstance = null;
 export function getDb() {
     if (!dbInstance) {
-        dbInstance = new sqlite3.Database(DB_PATH);
+        dbInstance = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+            if (err) {
+                console.error('[DocuVault DB] Failed to open SQLite database at', DB_PATH, err);
+            }
+            else {
+                console.log('[DocuVault DB] Successfully connected to SQLite at', DB_PATH);
+            }
+        });
     }
     return dbInstance;
 }
@@ -389,4 +417,3 @@ export async function initDatabase() {
     }
     console.log('✅ Document Vault SQLite database initialized with full schema and seed categories.');
 }
-export { STORAGE_DIR, VAULT_DIR, DB_PATH };
