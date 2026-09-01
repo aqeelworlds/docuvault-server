@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-01T16:21:05.533Z",
+  "exportedAt": "2026-09-01T16:57:28.817Z",
   "tables": {
     "users": [
       {
@@ -26,10 +26,10 @@
       {
         "id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "email": "docuvault.app.help@gmail.com",
-        "password_hash": "$2b$10$ock0e1bCjQY48ixIrBEp9uTZagxX78CfYdUhf/nWkAsTi27p8voh2",
-        "salt": "$2b$10$ock0e1bCjQY48ixIrBEp9u",
-        "created_at": "2026-08-24 09:21:25",
-        "updated_at": "2026-08-24 09:21:25",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-01T16:57:28.813Z",
+        "updated_at": "2026-09-01T16:57:28.817Z",
         "is_admin": 1,
         "last_login_at": null
       },
@@ -71,7 +71,7 @@
         "updated_at": "2026-08-24 09:21:25"
       },
       {
-        "id": "d7ce76c3-98d7-4fc7-bbff-f992b740400a",
+        "id": "prof_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "full_name": "Master Admin",
         "avatar_url": null,
@@ -80,8 +80,8 @@
         "app_lock_enabled": 0,
         "app_lock_pin_hash": null,
         "biometric_enabled": 0,
-        "created_at": "2026-08-24 09:21:25",
-        "updated_at": "2026-08-24 09:21:25"
+        "created_at": "2026-09-01T16:57:28.817Z",
+        "updated_at": "2026-09-01T16:57:28.817Z"
       },
       {
         "id": "prof_usr_demo_01",
@@ -120,6 +120,15 @@
         "current_period_end": "2027-08-23T00:00:00Z",
         "created_at": "2026-09-01T16:21:05.533Z",
         "updated_at": "2026-09-01T16:21:05.533Z"
+      },
+      {
+        "id": "sub_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
+        "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
+        "plan_id": "PRO_YEARLY",
+        "status": "ACTIVE",
+        "current_period_end": "2030-01-01T00:00:00Z",
+        "created_at": "2026-09-01T16:57:28.817Z",
+        "updated_at": "2026-09-01T16:57:28.817Z"
       }
     ],
     "documentTypes": [
@@ -273,7 +282,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! Ã°ÂÂÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document sharing & storage\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! ÃÂ°ÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document sharing & storage\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
