@@ -1,15 +1,15 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-01T16:57:28.817Z",
+  "exportedAt": "2026-09-01T17:07:50.503Z",
   "tables": {
     "users": [
       {
-        "id": "8750b646-de81-4201-ac11-8333ca9173da",
+        "id": "usr_1788282469455",
         "email": "aqeelpay38@gmail.com",
-        "password_hash": "$2b$10$ock0e1bCjQY48ixIrBEp9uTZagxX78CfYdUhf/nWkAsTi27p8voh2",
-        "salt": "$2b$10$ock0e1bCjQY48ixIrBEp9u",
-        "created_at": "2026-08-23 14:37:06",
-        "updated_at": "2026-08-24 09:12:14",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -100,6 +100,15 @@
         "timezone": "America/New_York",
         "created_at": "2026-09-01T16:21:05.533Z",
         "updated_at": "2026-09-01T16:21:05.533Z"
+      },
+      {
+        "id": "prof_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "full_name": "Qaisar Aqeel",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z"
       }
     ],
     "subscriptions": [
@@ -129,6 +138,15 @@
         "current_period_end": "2030-01-01T00:00:00Z",
         "created_at": "2026-09-01T16:57:28.817Z",
         "updated_at": "2026-09-01T16:57:28.817Z"
+      },
+      {
+        "id": "sub_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z"
       }
     ],
     "documentTypes": [
