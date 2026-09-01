@@ -282,7 +282,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! ÃÂ°ÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document sharing & storage\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available!\",\"message\":\"New update available on Google Play with improved features, performance improvements, and bug fixes.\\nUpdate now for a better experience!\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
