@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-01T16:20:27.787Z",
+  "exportedAt": "2026-09-01T16:21:05.533Z",
   "tables": {
     "users": [
       {
@@ -34,13 +34,13 @@
         "last_login_at": null
       },
       {
-        "id": "usr_demo_01",
+        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-01T16:20:27.786Z",
-        "updated_at": "2026-09-01T16:20:27.786Z"
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
       }
     ],
     "profiles": [
@@ -91,6 +91,15 @@
         "timezone": "America/New_York",
         "created_at": "2026-09-01T16:20:27.786Z",
         "updated_at": "2026-09-01T16:20:27.786Z"
+      },
+      {
+        "id": "prof_ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "user_id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "full_name": "Alexander Wright",
+        "phone": null,
+        "timezone": "America/New_York",
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
       }
     ],
     "subscriptions": [
@@ -102,6 +111,15 @@
         "current_period_end": null,
         "created_at": "2026-09-01T16:20:27.786Z",
         "updated_at": "2026-09-01T16:20:27.787Z"
+      },
+      {
+        "id": "sub_ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "user_id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "plan_id": "PRO_YEARLY",
+        "status": "ACTIVE",
+        "current_period_end": "2027-08-23T00:00:00Z",
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
       }
     ],
     "documentTypes": [
@@ -255,7 +273,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! ð\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document sharing & storage\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! Ã°ÂÂÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document sharing & storage\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
