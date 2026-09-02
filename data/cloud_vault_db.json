@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T07:55:28.586Z",
+  "exportedAt": "2026-09-02T09:07:10.021Z",
   "tables": {
     "users": [
       {
@@ -128,8 +128,8 @@
         "email": "docuvault.app.help@gmail.com",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
-        "created_at": "2026-09-02T07:55:28.585Z",
-        "updated_at": "2026-09-02T07:55:28.586Z",
+        "created_at": "2026-09-02T09:07:10.019Z",
+        "updated_at": "2026-09-02T09:07:10.021Z",
         "is_admin": 1,
         "last_login_at": null
       },
@@ -326,8 +326,8 @@
         "app_lock_enabled": 0,
         "app_lock_pin_hash": null,
         "biometric_enabled": 0,
-        "created_at": "2026-09-02T07:55:28.586Z",
-        "updated_at": "2026-09-02T07:55:28.586Z"
+        "created_at": "2026-09-02T09:07:10.021Z",
+        "updated_at": "2026-09-02T09:07:10.021Z"
       },
       {
         "id": "prof_ae6dcf93-d148-4311-80ee-15be6616d773",
@@ -562,8 +562,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2030-01-01T00:00:00Z",
-        "created_at": "2026-09-02T07:55:28.586Z",
-        "updated_at": "2026-09-02T07:55:28.586Z",
+        "created_at": "2026-09-02T09:07:10.021Z",
+        "updated_at": "2026-09-02T09:07:10.021Z",
         "payment_provider": "DIRECT",
         "order_id": null,
         "purchase_token": null,
