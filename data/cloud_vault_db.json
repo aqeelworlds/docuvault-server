@@ -639,8 +639,28 @@
     "documents": [],
     "attachments": [],
     "reminders": [],
-    "familyGroups": [],
-    "familyMembers": [],
+    "familyGroups": [
+      {
+        "id": "fam_usr_real_1",
+        "name": "Aqeel Family Vault",
+        "created_by_user_id": "usr_real_1",
+        "created_at": "2026-09-01T00:00:00.000Z"
+      }
+    ],
+    "familyMembers": [
+      {
+        "id": "mem_usr_real_1",
+        "family_group_id": "fam_usr_real_1",
+        "user_id": "usr_real_1",
+        "name": "Aqeel World",
+        "email": "aqeelworld38@gmail.com",
+        "relationship": "Self (Vault Owner)",
+        "role": "OWNER",
+        "status": "ACTIVE",
+        "avatar_color": "#4f46e5",
+        "created_at": "2026-09-01T00:00:00.000Z"
+      }
+    ],
     "documentPermissions": [],
     "activityHistory": [
       {
@@ -656,6 +676,21 @@
         "id": "app_update_1",
         "key": "app_version_update",
         "value": "{\"latestVersionCode\":50,\"latestVersionName\":\"4.3.0\",\"title\":\"New Update Available\",\"message\":\"New update available on Google Play with improved features, performance improvements, and bug fixes.\\n\\nUpdate now for a better experience!\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+      }
+    ],
+    "familyInvitations": [
+      {
+        "id": "inv_2IWRQA",
+        "family_group_id": "fam_usr_real_1",
+        "owner_user_id": "usr_real_1",
+        "owner_name": "Aqeel World",
+        "email": "aqeelpay38@gmail.com",
+        "name": "Aqeel Pay",
+        "invite_code": "FAM-2IWRQA",
+        "relationship": "Family Member",
+        "role": "MEMBER",
+        "status": "PENDING",
+        "created_at": "2026-09-02T16:15:56.084Z"
       }
     ]
   }
