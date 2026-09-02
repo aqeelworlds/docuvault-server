@@ -1,15 +1,15 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T03:58:55.970Z",
+  "exportedAt": "2026-09-01T17:07:50.503Z",
   "tables": {
     "users": [
       {
-        "id": "usr_real_3",
-        "email": "tayybatabassam@gmail.com",
-        "password_hash": "$2b$10$02qJ0ofG9mehFlf7geHTtu/9hv0Oq/ec.1Fv/RM0iknOKxGKr12bS",
-        "salt": "$2b$10$02qJ0ofG9mehFlf7geHTtu",
-        "created_at": "2026-09-02T03:58:54.026Z",
-        "updated_at": "2026-09-02T03:58:54.026Z",
+        "id": "usr_1788282469455",
+        "email": "aqeelpay38@gmail.com",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -126,32 +126,21 @@
       {
         "id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "email": "docuvault.app.help@gmail.com",
-        "password_hash": "$2b$10$02qJ0ofG9mehFlf7geHTtu/9hv0Oq/ec.1Fv/RM0iknOKxGKr12bS",
-        "salt": "$2b$10$02qJ0ofG9mehFlf7geHTtu",
-        "created_at": "2026-09-02T03:58:54.031Z",
-        "updated_at": "2026-09-02T03:58:54.031Z",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-01T16:57:28.813Z",
+        "updated_at": "2026-09-01T16:57:28.817Z",
         "is_admin": 1,
         "last_login_at": null
       },
       {
-        "id": "ae6dcf93-d148-4311-80ee-15be6616d773",
-        "email": "admin@docuvault.app",
-        "password_hash": "$2b$10$02qJ0ofG9mehFlf7geHTtu/9hv0Oq/ec.1Fv/RM0iknOKxGKr12bS",
-        "salt": "$2b$10$02qJ0ofG9mehFlf7geHTtu",
-        "created_at": "2026-09-02T03:58:54.031Z",
-        "updated_at": "2026-09-02T03:58:54.031Z",
-        "is_admin": 1,
-        "last_login_at": null
-      },
-      {
-        "id": "usr_real_11",
-        "email": "sa574354@gmail.com",
-        "password_hash": "$2b$10$02qJ0ofG9mehFlf7geHTtu/9hv0Oq/ec.1Fv/RM0iknOKxGKr12bS",
-        "salt": "$2b$10$02qJ0ofG9mehFlf7geHTtu",
-        "created_at": "2026-09-02T03:58:54.029Z",
-        "updated_at": "2026-09-02T03:58:54.029Z",
+        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "email": "demo.family@vault.local",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
         "is_admin": 0,
-        "last_login_at": null
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
       }
     ],
     "profiles": [
@@ -273,45 +262,6 @@
         "updated_at": "2026-09-02T03:58:54.028Z"
       },
       {
-        "id": "prof_usr_real_11",
-        "user_id": "usr_real_11",
-        "full_name": "SA Tester",
-        "avatar_url": null,
-        "phone": null,
-        "timezone": "UTC",
-        "app_lock_enabled": 0,
-        "app_lock_pin_hash": null,
-        "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.029Z",
-        "updated_at": "2026-09-02T03:58:54.029Z"
-      },
-      {
-        "id": "prof_usr_real_12",
-        "user_id": "usr_real_12",
-        "full_name": "Samreen Zahra",
-        "avatar_url": null,
-        "phone": null,
-        "timezone": "UTC",
-        "app_lock_enabled": 0,
-        "app_lock_pin_hash": null,
-        "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.030Z",
-        "updated_at": "2026-09-02T03:58:54.030Z"
-      },
-      {
-        "id": "prof_usr_real_10",
-        "user_id": "usr_real_10",
-        "full_name": "Qaisar Aqeel 2",
-        "avatar_url": null,
-        "phone": null,
-        "timezone": "UTC",
-        "app_lock_enabled": 0,
-        "app_lock_pin_hash": null,
-        "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.029Z",
-        "updated_at": "2026-09-02T03:58:54.029Z"
-      },
-      {
         "id": "prof_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "full_name": "Master Administrator",
@@ -321,37 +271,76 @@
         "app_lock_enabled": 0,
         "app_lock_pin_hash": null,
         "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.031Z",
-        "updated_at": "2026-09-02T03:58:54.031Z"
+        "created_at": "2026-09-01T16:57:28.817Z",
+        "updated_at": "2026-09-01T16:57:28.817Z"
       },
       {
-        "id": "prof_usr_real_13",
-        "user_id": "usr_real_13",
-        "full_name": "Tayyba 38",
-        "avatar_url": null,
-        "phone": null,
-        "timezone": "UTC",
-        "app_lock_enabled": 0,
-        "app_lock_pin_hash": null,
-        "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.031Z",
-        "updated_at": "2026-09-02T03:58:54.031Z"
+        "id": "prof_usr_demo_01",
+        "user_id": "usr_demo_01",
+        "full_name": "Alexander Smith",
+        "phone": "+1 (555) 019-2834",
+        "timezone": "America/New_York",
+        "created_at": "2026-09-01T16:20:27.786Z",
+        "updated_at": "2026-09-01T16:20:27.786Z"
       },
       {
-        "id": "prof_ae6dcf93-d148-4311-80ee-15be6616d773",
-        "user_id": "ae6dcf93-d148-4311-80ee-15be6616d773",
-        "full_name": "DocuVault Admin",
-        "avatar_url": null,
+        "id": "prof_ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "user_id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "full_name": "Alexander Wright",
+        "phone": null,
+        "timezone": "America/New_York",
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
+      },
+      {
+        "id": "prof_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "full_name": "Qaisar Aqeel",
         "phone": null,
         "timezone": "UTC",
-        "app_lock_enabled": 0,
-        "app_lock_pin_hash": null,
-        "biometric_enabled": 0,
-        "created_at": "2026-09-02T03:58:54.031Z",
-        "updated_at": "2026-09-02T03:58:54.031Z"
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z"
       }
     ],
     "subscriptions": [
+      {
+        "id": "sub_usr_demo_01",
+        "user_id": "usr_demo_01",
+        "plan_id": "PRO_LIFETIME",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-01T16:20:27.786Z",
+        "updated_at": "2026-09-01T16:20:27.787Z"
+      },
+      {
+        "id": "sub_ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "user_id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "plan_id": "PRO_YEARLY",
+        "status": "ACTIVE",
+        "current_period_end": "2027-08-23T00:00:00Z",
+        "created_at": "2026-09-01T16:21:05.533Z",
+        "updated_at": "2026-09-01T16:21:05.533Z"
+      },
+      {
+        "id": "sub_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
+        "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
+        "plan_id": "PRO_YEARLY",
+        "status": "ACTIVE",
+        "current_period_end": "2030-01-01T00:00:00Z",
+        "created_at": "2026-09-01T16:57:28.817Z",
+        "updated_at": "2026-09-01T16:57:28.817Z"
+      },
+      {
+        "id": "sub_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-01T17:07:50.503Z",
+        "updated_at": "2026-09-01T17:07:50.503Z"
+      }
+    ],
+    "documentTypes": [
       {
         "id": "sub_usr_real_3",
         "user_id": "usr_real_3",
@@ -583,7 +572,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available! 🚀\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":42,\"latestVersionName\":\"4.1.0\",\"title\":\"DocuVault Update Available!\",\"message\":\"New update available on Google Play with improved features, performance improvements, and bug fixes.\\nUpdate now for a better experience!\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
