@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T17:42:46.533Z",
+  "exportedAt": "2026-09-02T17:55:16.517Z",
   "tables": {
     "users": [
       {
@@ -159,8 +159,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-02T16:02:31.698Z",
-        "updated_at": "2026-09-02T16:02:31.698Z"
+        "created_at": "2026-09-02T17:55:16.516Z",
+        "updated_at": "2026-09-02T17:55:16.516Z"
       },
       {
         "id": "usr_1788370216500",
@@ -392,8 +392,8 @@
         "full_name": "QAISAR AQEEL",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-02T16:02:31.698Z",
-        "updated_at": "2026-09-02T16:02:31.698Z"
+        "created_at": "2026-09-02T17:55:16.517Z",
+        "updated_at": "2026-09-02T17:55:16.517Z"
       },
       {
         "id": "prof_usr_1788370216500",
@@ -640,8 +640,8 @@
         "plan_id": "FREE",
         "status": "ACTIVE",
         "current_period_end": null,
-        "created_at": "2026-09-02T16:02:31.698Z",
-        "updated_at": "2026-09-02T16:02:31.698Z"
+        "created_at": "2026-09-02T17:55:16.517Z",
+        "updated_at": "2026-09-02T17:55:16.517Z"
       },
       {
         "id": "sub_usr_1788370216500",
@@ -693,7 +693,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":60,\"latestVersionName\":\"4.4.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":60,\"latestVersionName\":\"4.4.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
