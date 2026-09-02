@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T06:14:18.452Z",
+  "exportedAt": "2026-09-02T06:16:05.358Z",
   "tables": {
     "users": [
       {
@@ -126,10 +126,10 @@
       {
         "id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "email": "docuvault.app.help@gmail.com",
-        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
-        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
-        "created_at": "2026-09-02T04:01:56.713Z",
-        "updated_at": "2026-09-02T04:01:56.713Z",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-02T06:16:05.358Z",
+        "updated_at": "2026-09-02T06:16:05.358Z",
         "is_admin": 1,
         "last_login_at": null
       },
@@ -319,15 +319,15 @@
       {
         "id": "prof_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
-        "full_name": "Master Administrator",
+        "full_name": "Master Admin",
         "avatar_url": null,
         "phone": null,
         "timezone": "UTC",
         "app_lock_enabled": 0,
         "app_lock_pin_hash": null,
         "biometric_enabled": 0,
-        "created_at": "2026-09-02T04:01:56.713Z",
-        "updated_at": "2026-09-02T04:01:56.713Z"
+        "created_at": "2026-09-02T06:16:05.358Z",
+        "updated_at": "2026-09-02T06:16:05.358Z"
       },
       {
         "id": "prof_ae6dcf93-d148-4311-80ee-15be6616d773",
@@ -559,11 +559,11 @@
       {
         "id": "sub_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
-        "plan_id": "FREE",
+        "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-02T04:01:56.713Z",
-        "updated_at": "2026-09-02T04:01:56.713Z",
+        "current_period_end": "2030-01-01T00:00:00Z",
+        "created_at": "2026-09-02T06:16:05.358Z",
+        "updated_at": "2026-09-02T06:16:05.358Z",
         "payment_provider": "DIRECT",
         "order_id": null,
         "purchase_token": null,
@@ -637,7 +637,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
