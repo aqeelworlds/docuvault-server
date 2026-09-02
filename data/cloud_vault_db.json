@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T11:05:26.311Z",
+  "exportedAt": "2026-09-02T11:05:56.842Z",
   "tables": {
     "users": [
       {
@@ -168,8 +168,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-02T10:41:06.220Z",
-        "updated_at": "2026-09-02T10:41:06.220Z"
+        "created_at": "2026-09-02T11:05:56.842Z",
+        "updated_at": "2026-09-02T11:05:56.842Z"
       }
     ],
     "profiles": [
@@ -383,8 +383,8 @@
         "full_name": "Alexander Wright",
         "phone": null,
         "timezone": "America/New_York",
-        "created_at": "2026-09-02T10:41:06.223Z",
-        "updated_at": "2026-09-02T10:41:06.223Z"
+        "created_at": "2026-09-02T11:05:56.842Z",
+        "updated_at": "2026-09-02T11:05:56.842Z"
       }
     ],
     "subscriptions": [
@@ -613,8 +613,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2027-08-23T00:00:00Z",
-        "created_at": "2026-09-02T10:41:06.223Z",
-        "updated_at": "2026-09-02T10:41:06.223Z"
+        "created_at": "2026-09-02T11:05:56.842Z",
+        "updated_at": "2026-09-02T11:05:56.842Z"
       }
     ],
     "documentTypes": [],
