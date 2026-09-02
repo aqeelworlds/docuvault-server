@@ -9,12 +9,12 @@ import { ensureFreshData, syncToCloudNow } from '../db/cloudSync.js';
 export async function getAdminStats(req, res) {
     try {
         await ensureFreshData(true);
-        const totalUsersRow = await dbGet('SELECT COUNT(*) as count FROM users');
-        const totalDocsRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0');
-        const totalArchivedRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1');
-        const totalRemindersRow = await dbGet('SELECT COUNT(*) as count FROM reminders WHERE is_active = 1');
-        const totalFamiliesRow = await dbGet('SELECT COUNT(*) as count FROM family_groups');
-        const subCounts = await dbAll('SELECT plan_id, COUNT(*) as count FROM subscriptions WHERE status = "ACTIVE" GROUP BY plan_id');
+        const totalUsersRow = await dbGet('SELECT COUNT(*) as count FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com"');
+        const totalDocsRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0 AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
+        const totalArchivedRow = await dbGet('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1 AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
+        const totalRemindersRow = await dbGet('SELECT COUNT(*) as count FROM reminders WHERE is_active = 1 AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
+        const totalFamiliesRow = await dbGet('SELECT COUNT(*) as count FROM family_groups WHERE created_by_user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
+        const subCounts = await dbAll('SELECT plan_id, COUNT(*) as count FROM subscriptions WHERE status = "ACTIVE" AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com") GROUP BY plan_id');
         let freeCount = 0;
         let monthlyCount = 0;
         let yearlyCount = 0;
@@ -93,7 +93,7 @@ export async function getAllUsers(req, res) {
       LEFT JOIN subscriptions s ON u.id = s.user_id
       LEFT JOIN family_members fm ON (fm.user_id = u.id AND fm.role = 'OWNER')
       LEFT JOIN family_groups fg ON fm.family_group_id = fg.id
-      WHERE 1=1
+      WHERE u.email NOT LIKE "%@vault.local" AND u.email NOT LIKE "%@evil.local" AND u.email NOT LIKE "%@example.com"
     `;
         const params = [];
         if (q) {

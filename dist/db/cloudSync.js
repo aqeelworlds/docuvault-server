@@ -218,7 +218,17 @@ async function restoreSnapshot(snapshot) {
     const t = snapshot.tables;
     try {
         await dbRun('BEGIN TRANSACTION');
-        if (Array.isArray(t.users)) {
+        if (Array.isArray(t.users) && t.users.length > 0) {
+            const allowedEmails = t.users.map((u) => u.email.toLowerCase());
+            const placeholders = allowedEmails.map(() => '?').join(',');
+            await dbRun(`DELETE FROM users WHERE LOWER(email) NOT IN (${placeholders})`, allowedEmails);
+            await dbRun('DELETE FROM profiles WHERE user_id NOT IN (SELECT id FROM users)');
+            await dbRun('DELETE FROM subscriptions WHERE user_id NOT IN (SELECT id FROM users)');
+            await dbRun('DELETE FROM documents WHERE user_id NOT IN (SELECT id FROM users)');
+            await dbRun('DELETE FROM document_attachments WHERE document_id NOT IN (SELECT id FROM documents)');
+            await dbRun('DELETE FROM reminders WHERE document_id NOT IN (SELECT id FROM documents)');
+            await dbRun('DELETE FROM family_members WHERE user_id NOT IN (SELECT id FROM users)');
+            await dbRun('DELETE FROM family_groups WHERE created_by_user_id NOT IN (SELECT id FROM users)');
             for (const u of t.users) {
                 await dbRun('INSERT OR REPLACE INTO users (id, email, password_hash, salt, is_admin, last_login_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [u.id, u.email, u.password_hash, u.salt, u.is_admin || 0, u.last_login_at || null, u.created_at, u.updated_at]);
             }
