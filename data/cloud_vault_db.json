@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T06:00:46.182Z",
+  "exportedAt": "2026-09-02T06:14:18.452Z",
   "tables": {
     "users": [
       {
@@ -161,6 +161,15 @@
         "is_admin": 0,
         "created_at": "2026-09-02T06:00:46.182Z",
         "updated_at": "2026-09-02T06:00:46.182Z"
+      },
+      {
+        "id": "usr_1788282469455",
+        "email": "aqeelpay38@gmail.com",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "is_admin": 0,
+        "created_at": "2026-09-02T06:14:18.452Z",
+        "updated_at": "2026-09-02T06:14:18.452Z"
       }
     ],
     "profiles": [
@@ -367,6 +376,15 @@
         "timezone": "America/New_York",
         "created_at": "2026-09-02T06:00:46.182Z",
         "updated_at": "2026-09-02T06:00:46.182Z"
+      },
+      {
+        "id": "prof_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "full_name": "Qaisar Aqeel",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-02T06:14:18.452Z",
+        "updated_at": "2026-09-02T06:14:18.452Z"
       }
     ],
     "subscriptions": [
@@ -588,6 +606,15 @@
         "current_period_end": "2027-08-23T00:00:00Z",
         "created_at": "2026-09-02T06:00:46.182Z",
         "updated_at": "2026-09-02T06:00:46.182Z"
+      },
+      {
+        "id": "sub_usr_1788282469455",
+        "user_id": "usr_1788282469455",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-02T06:14:18.452Z",
+        "updated_at": "2026-09-02T06:14:18.452Z"
       }
     ],
     "documentTypes": [],
@@ -610,7 +637,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
