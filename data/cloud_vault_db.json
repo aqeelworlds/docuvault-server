@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T05:42:16.358Z",
+  "exportedAt": "2026-09-02T05:56:38.577Z",
   "tables": {
     "users": [
       {
@@ -159,8 +159,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-02T05:42:16.357Z",
-        "updated_at": "2026-09-02T05:42:16.357Z"
+        "created_at": "2026-09-02T05:56:38.576Z",
+        "updated_at": "2026-09-02T05:56:38.576Z"
       }
     ],
     "profiles": [
@@ -365,8 +365,8 @@
         "full_name": "Alexander Wright",
         "phone": null,
         "timezone": "America/New_York",
-        "created_at": "2026-09-02T05:42:16.357Z",
-        "updated_at": "2026-09-02T05:42:16.357Z"
+        "created_at": "2026-09-02T05:56:38.577Z",
+        "updated_at": "2026-09-02T05:56:38.577Z"
       }
     ],
     "subscriptions": [
@@ -586,8 +586,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2027-08-23T00:00:00Z",
-        "created_at": "2026-09-02T05:42:16.358Z",
-        "updated_at": "2026-09-02T05:42:16.358Z"
+        "created_at": "2026-09-02T05:56:38.577Z",
+        "updated_at": "2026-09-02T05:56:38.577Z"
       }
     ],
     "documentTypes": [],
@@ -610,7 +610,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂ°ÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":43,\"latestVersionName\":\"4.2.0\",\"title\":\"DocuVault Update Available! ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"New update available on Google Play with real-time cloud sync, free family sharing, and PDF previews.\",\"releaseNotes\":[\"Real-time multi-device cloud synchronization\",\"Family Vault free 2-member allowance\",\"Enhanced document download & sharing\",\"Smoother PDF & document previews\"],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
