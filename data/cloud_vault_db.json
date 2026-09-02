@@ -637,7 +637,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":44,\"latestVersionName\":\"4.3.0\",\"title\":\"New Update Available\",\"message\":\"New update available on Google Play with improved features, performance improvements, and bug fixes.\\n\\nUpdate now for a better experience!\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":50,\"latestVersionName\":\"4.3.0\",\"title\":\"New Update Available\",\"message\":\"New update available on Google Play with improved features, performance improvements, and bug fixes.\\n\\nUpdate now for a better experience!\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ]
   }
