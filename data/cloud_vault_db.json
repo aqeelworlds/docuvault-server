@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-03T05:58:16.000Z",
+  "exportedAt": "2026-09-03T05:58:30.588Z",
   "tables": {
     "users": [
       {
@@ -702,9 +702,9 @@
       },
       {
         "id": "fam_usr_1788364946268",
-        "name": "QAISAR AQEEL's Vault",
+        "name": "QAISAR AQEEL's Family Vault",
         "created_by_user_id": "usr_1788364946268",
-        "created_at": "2026-09-02T16:02:51.088Z"
+        "created_at": "2026-09-03T05:58:28.254Z"
       }
     ],
     "familyMembers": [
@@ -763,9 +763,11 @@
         "invite_code": "FAM-05U48E",
         "relationship": "Brother",
         "role": "MEMBER",
-        "status": "PENDING",
+        "status": "ACTIVE",
         "expires_at": "2026-09-06T05:53:32.722Z",
-        "created_at": "2026-09-03T05:53:32.722Z"
+        "created_at": "2026-09-03T05:53:32.722Z",
+        "joined_user_id": "usr_1787844658293",
+        "joined_name": "Faizan Ali"
       }
     ]
   }
