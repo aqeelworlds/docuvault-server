@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-03T17:09:53.685Z",
+  "exportedAt": "2026-09-03T17:22:40.213Z",
   "tables": {
     "users": [
       {
@@ -170,6 +170,15 @@
         "is_admin": 0,
         "created_at": "2026-09-02T18:50:33.156Z",
         "updated_at": "2026-09-02T19:03:48.047Z"
+      },
+      {
+        "id": "usr_1787828512760",
+        "email": "ali@gmaiill.com",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "is_admin": 0,
+        "created_at": "2026-09-03T17:22:40.212Z",
+        "updated_at": "2026-09-03T17:22:40.212Z"
       }
     ],
     "profiles": [
@@ -421,6 +430,15 @@
         "timezone": "Asia/Karachi",
         "created_at": "2026-09-03T17:09:53.685Z",
         "updated_at": "2026-09-03T17:09:53.685Z"
+      },
+      {
+        "id": "prof_usr_1787828512760",
+        "user_id": "usr_1787828512760",
+        "full_name": "ali",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-03T17:22:40.213Z",
+        "updated_at": "2026-09-03T17:22:40.213Z"
       }
     ],
     "subscriptions": [
@@ -687,6 +705,15 @@
         "current_period_end": null,
         "created_at": "2026-09-03T17:09:53.685Z",
         "updated_at": "2026-09-03T17:09:53.685Z"
+      },
+      {
+        "id": "sub_usr_1787828512760",
+        "user_id": "usr_1787828512760",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-03T17:22:40.213Z",
+        "updated_at": "2026-09-03T17:22:40.213Z"
       }
     ],
     "documentTypes": [],
