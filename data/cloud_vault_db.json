@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-04T10:39:04.417Z",
+  "exportedAt": "2026-09-04T17:00:55.414Z",
   "tables": {
     "users": [
       {
@@ -159,8 +159,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-03T16:34:51.793Z",
-        "updated_at": "2026-09-03T16:34:51.793Z"
+        "created_at": "2026-09-04T17:00:55.414Z",
+        "updated_at": "2026-09-04T17:00:55.414Z"
       },
       {
         "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
@@ -401,8 +401,8 @@
         "full_name": "QAISAR AQEEL",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-03T16:34:51.793Z",
-        "updated_at": "2026-09-03T16:34:51.793Z"
+        "created_at": "2026-09-04T17:00:55.414Z",
+        "updated_at": "2026-09-04T17:00:55.414Z"
       },
       {
         "id": "prof_usr_1788370216500",
@@ -676,8 +676,8 @@
         "plan_id": "FREE",
         "status": "ACTIVE",
         "current_period_end": null,
-        "created_at": "2026-09-03T16:34:51.793Z",
-        "updated_at": "2026-09-03T16:34:51.793Z"
+        "created_at": "2026-09-04T17:00:55.414Z",
+        "updated_at": "2026-09-04T17:00:55.414Z"
       },
       {
         "id": "sub_usr_1788370216500",
