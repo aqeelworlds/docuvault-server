@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-05T12:14:01.669Z",
+  "exportedAt": "2026-09-05T18:21:48.529Z",
   "tables": {
     "users": [
       {
@@ -34,12 +34,12 @@
         "last_login_at": null
       },
       {
-        "id": "usr_real_4",
+        "id": "usr_1787824456947",
         "email": "adeelpay38@gmail.com",
-        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
-        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
-        "created_at": "2026-09-02T04:01:56.710Z",
-        "updated_at": "2026-09-02T04:01:56.710Z",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-05T18:21:48.528Z",
+        "updated_at": "2026-09-05T18:21:48.528Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -448,6 +448,15 @@
         "timezone": "UTC",
         "created_at": "2026-09-04T19:00:24.791Z",
         "updated_at": "2026-09-04T19:00:24.791Z"
+      },
+      {
+        "id": "prof_usr_1787824456947",
+        "user_id": "usr_1787824456947",
+        "full_name": "Adeel Ikram",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-05T18:21:48.528Z",
+        "updated_at": "2026-09-05T18:21:48.529Z"
       }
     ],
     "subscriptions": [
@@ -732,6 +741,15 @@
         "current_period_end": null,
         "created_at": "2026-09-04T19:00:24.791Z",
         "updated_at": "2026-09-04T19:00:24.791Z"
+      },
+      {
+        "id": "sub_usr_1787824456947",
+        "user_id": "usr_1787824456947",
+        "plan_id": "PRO_LIFETIME",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-05T18:21:48.529Z",
+        "updated_at": "2026-09-05T18:21:48.529Z"
       }
     ],
     "documentTypes": [],
