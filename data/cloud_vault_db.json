@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-06T17:13:47.561Z",
+  "exportedAt": "2026-09-06T17:14:27.271Z",
   "tables": {
     "users": [
       {
@@ -780,6 +780,12 @@
         "name": "Aqeel Family Vault",
         "created_by_user_id": "usr_real_1",
         "created_at": "2026-09-01T00:00:00.000Z"
+      },
+      {
+        "id": "fam_usr_1788364946268",
+        "name": "QAISAR AQEEL's Vault",
+        "created_by_user_id": "usr_1788364946268",
+        "created_at": "2026-09-02T16:02:51.088Z"
       }
     ],
     "familyMembers": [
@@ -827,6 +833,20 @@
         "status": "PENDING",
         "expires_at": "2026-09-06T16:15:56.084Z",
         "created_at": "2026-09-02T16:15:56.084Z"
+      },
+      {
+        "id": "inv_1788714864485",
+        "family_group_id": "fam_usr_1788364946268",
+        "owner_user_id": "usr_1788364946268",
+        "owner_name": "QAISAR AQEEL",
+        "email": "tayyba3838@gmail.com",
+        "name": "Tayyba Tabassam",
+        "invite_code": "FAM-90MYYP",
+        "relationship": "Other",
+        "role": "MEMBER",
+        "status": "PENDING",
+        "expires_at": "2026-09-09T17:14:24.485Z",
+        "created_at": "2026-09-06T17:14:24.485Z"
       }
     ]
   }
