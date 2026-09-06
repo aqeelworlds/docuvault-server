@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-05T18:28:11.661Z",
+  "exportedAt": "2026-09-06T02:20:30.918Z",
   "tables": {
     "users": [
       {
@@ -38,8 +38,8 @@
         "email": "adeelpay38@gmail.com",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
-        "created_at": "2026-09-05T18:21:48.528Z",
-        "updated_at": "2026-09-05T18:21:48.528Z",
+        "created_at": "2026-09-06T02:20:30.918Z",
+        "updated_at": "2026-09-06T02:20:30.918Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -455,8 +455,8 @@
         "full_name": "Adeel Ikram",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-05T18:21:48.528Z",
-        "updated_at": "2026-09-05T18:21:48.529Z"
+        "created_at": "2026-09-06T02:20:30.918Z",
+        "updated_at": "2026-09-06T02:20:30.918Z"
       }
     ],
     "subscriptions": [
@@ -748,8 +748,8 @@
         "plan_id": "PRO_LIFETIME",
         "status": "ACTIVE",
         "current_period_end": null,
-        "created_at": "2026-09-05T18:21:48.529Z",
-        "updated_at": "2026-09-05T18:21:48.529Z"
+        "created_at": "2026-09-06T02:20:30.918Z",
+        "updated_at": "2026-09-06T02:20:30.918Z"
       }
     ],
     "documentTypes": [],
