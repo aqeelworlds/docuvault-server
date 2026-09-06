@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-06T02:20:30.918Z",
+  "exportedAt": "2026-09-06T13:32:03.757Z",
   "tables": {
     "users": [
       {
@@ -104,12 +104,12 @@
         "last_login_at": null
       },
       {
-        "id": "usr_real_12",
+        "id": "usr_1787910716555",
         "email": "samreenzahra38383@gmail.com",
-        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
-        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
-        "created_at": "2026-09-02T04:01:56.712Z",
-        "updated_at": "2026-09-02T04:01:56.712Z",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-06T13:32:03.756Z",
+        "updated_at": "2026-09-06T13:32:03.756Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -457,6 +457,15 @@
         "timezone": "UTC",
         "created_at": "2026-09-06T02:20:30.918Z",
         "updated_at": "2026-09-06T02:20:30.918Z"
+      },
+      {
+        "id": "prof_usr_1787910716555",
+        "user_id": "usr_1787910716555",
+        "full_name": "SamreenZ",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-06T13:32:03.756Z",
+        "updated_at": "2026-09-06T13:32:03.756Z"
       }
     ],
     "subscriptions": [
@@ -750,6 +759,15 @@
         "current_period_end": null,
         "created_at": "2026-09-06T02:20:30.918Z",
         "updated_at": "2026-09-06T02:20:30.918Z"
+      },
+      {
+        "id": "sub_usr_1787910716555",
+        "user_id": "usr_1787910716555",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-06T13:32:03.757Z",
+        "updated_at": "2026-09-06T13:32:03.757Z"
       }
     ],
     "documentTypes": [],
