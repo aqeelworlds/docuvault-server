@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-07T04:26:46.834Z",
+  "exportedAt": "2026-09-07T04:27:36.760Z",
   "tables": {
     "users": [
       {
@@ -163,13 +163,13 @@
         "updated_at": "2026-09-02T17:58:35.341Z"
       },
       {
-        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "id": "usr_1788755254591",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-07T04:26:46.833Z",
-        "updated_at": "2026-09-07T04:26:46.833Z"
+        "created_at": "2026-09-07T04:27:34.591Z",
+        "updated_at": "2026-09-07T04:27:36.759Z"
       }
     ],
     "profiles": [
@@ -412,6 +412,15 @@
         "timezone": "UTC",
         "created_at": "2026-09-02T18:50:33.156Z",
         "updated_at": "2026-09-02T19:03:48.047Z"
+      },
+      {
+        "id": "prof_usr_1788755254591",
+        "user_id": "usr_1788755254591",
+        "full_name": "demo.family",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-07T04:27:34.591Z",
+        "updated_at": "2026-09-07T04:27:36.760Z"
       }
     ],
     "subscriptions": [
@@ -669,6 +678,15 @@
         "current_period_end": null,
         "created_at": "2026-09-02T18:50:33.156Z",
         "updated_at": "2026-09-02T19:03:48.048Z"
+      },
+      {
+        "id": "sub_usr_1788755254591",
+        "user_id": "usr_1788755254591",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-07T04:27:34.591Z",
+        "updated_at": "2026-09-07T04:27:36.760Z"
       }
     ],
     "documentTypes": [],
