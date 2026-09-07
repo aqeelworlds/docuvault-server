@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-07T09:13:58.405Z",
+  "exportedAt": "2026-09-07T09:15:02.545Z",
   "tables": {
     "users": [
       {
@@ -714,9 +714,9 @@
     "familyGroups": [
       {
         "id": "fam_usr_real_1",
-        "name": "Aqeel Family Vault",
+        "name": "Aqeel World's Family Vault",
         "created_by_user_id": "usr_real_1",
-        "created_at": "2026-09-01T00:00:00.000Z"
+        "created_at": "2026-09-07T09:15:01.147Z"
       }
     ],
     "familyMembers": [
@@ -731,6 +731,20 @@
         "status": "ACTIVE",
         "avatar_color": "#4f46e5",
         "created_at": "2026-09-01T00:00:00.000Z"
+      },
+      {
+        "id": "mem_usr_1788364946268",
+        "family_group_id": "fam_usr_real_1",
+        "user_id": "usr_1788364946268",
+        "name": "QAISAR AQEEL",
+        "email": "aqeelpay38@gmail.com",
+        "relationship": "Family Member",
+        "role": "MEMBER",
+        "status": "ACTIVE",
+        "avatar_color": "#10b981",
+        "invitation_id": "inv_2IWRQA",
+        "invite_code": "FAM-2IWRQA",
+        "joined_at": "2026-09-07T09:15:02.545Z"
       }
     ],
     "documentPermissions": [],
@@ -761,9 +775,11 @@
         "invite_code": "FAM-2IWRQA",
         "relationship": "Family Member",
         "role": "MEMBER",
-        "status": "PENDING",
+        "status": "ACTIVE",
         "expires_at": "2026-09-06T16:15:56.084Z",
-        "created_at": "2026-09-02T16:15:56.084Z"
+        "created_at": "2026-09-02T16:15:56.084Z",
+        "joined_user_id": "usr_1788364946268",
+        "joined_name": "QAISAR AQEEL"
       }
     ]
   }
