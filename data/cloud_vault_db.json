@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-07T04:27:59.300Z",
+  "exportedAt": "2026-09-07T04:29:31.741Z",
   "tables": {
     "users": [
       {
@@ -163,13 +163,13 @@
         "updated_at": "2026-09-02T17:58:35.341Z"
       },
       {
-        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "id": "usr_1788755254591",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-07T04:27:59.300Z",
-        "updated_at": "2026-09-07T04:27:59.300Z"
+        "created_at": "2026-09-07T04:27:34.591Z",
+        "updated_at": "2026-09-07T04:29:31.741Z"
       }
     ],
     "profiles": [
@@ -420,7 +420,7 @@
         "phone": null,
         "timezone": "UTC",
         "created_at": "2026-09-07T04:27:34.591Z",
-        "updated_at": "2026-09-07T04:27:36.760Z"
+        "updated_at": "2026-09-07T04:29:31.741Z"
       }
     ],
     "subscriptions": [
@@ -686,7 +686,7 @@
         "status": "ACTIVE",
         "current_period_end": null,
         "created_at": "2026-09-07T04:27:34.591Z",
-        "updated_at": "2026-09-07T04:27:36.760Z"
+        "updated_at": "2026-09-07T04:29:31.741Z"
       }
     ],
     "documentTypes": [],
