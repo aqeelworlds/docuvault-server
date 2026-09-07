@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-06T17:14:27.271Z",
+  "exportedAt": "2026-09-02T19:03:48.048Z",
   "tables": {
     "users": [
       {
@@ -34,32 +34,32 @@
         "last_login_at": null
       },
       {
-        "id": "usr_1787824456947",
+        "id": "usr_real_4",
         "email": "adeelpay38@gmail.com",
-        "password_hash": "sha256_client_synced",
-        "salt": "salt_client",
-        "created_at": "2026-09-06T02:20:30.918Z",
-        "updated_at": "2026-09-06T02:20:30.918Z",
+        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
+        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
+        "created_at": "2026-09-02T04:01:56.710Z",
+        "updated_at": "2026-09-02T04:01:56.710Z",
         "is_admin": 0,
         "last_login_at": null
       },
       {
-        "id": "usr_1787911754897",
+        "id": "usr_real_5",
         "email": "adeelworld38@gmail.com",
-        "password_hash": "sha256_client_synced",
-        "salt": "salt_client",
-        "created_at": "2026-09-06T17:06:20.644Z",
-        "updated_at": "2026-09-06T17:06:20.644Z",
+        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
+        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
+        "created_at": "2026-09-02T04:01:56.710Z",
+        "updated_at": "2026-09-02T04:01:56.710Z",
         "is_admin": 0,
         "last_login_at": null
       },
       {
-        "id": "usr_1787768439248",
+        "id": "usr_real_7",
         "email": "hassanmunib120@gmail.com",
-        "password_hash": "sha256_client_synced",
-        "salt": "salt_client",
-        "created_at": "2026-09-03T17:09:53.685Z",
-        "updated_at": "2026-09-03T17:09:53.685Z",
+        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
+        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
+        "created_at": "2026-09-02T04:01:56.711Z",
+        "updated_at": "2026-09-02T04:01:56.711Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -104,12 +104,12 @@
         "last_login_at": null
       },
       {
-        "id": "usr_1787910716555",
+        "id": "usr_real_12",
         "email": "samreenzahra38383@gmail.com",
-        "password_hash": "sha256_client_synced",
-        "salt": "salt_client",
-        "created_at": "2026-09-06T13:32:03.756Z",
-        "updated_at": "2026-09-06T13:32:03.756Z",
+        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
+        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
+        "created_at": "2026-09-02T04:01:56.712Z",
+        "updated_at": "2026-09-02T04:01:56.712Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -159,26 +159,17 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-06T17:13:47.561Z",
-        "updated_at": "2026-09-06T17:13:47.561Z"
+        "created_at": "2026-09-02T17:58:35.341Z",
+        "updated_at": "2026-09-02T17:58:35.341Z"
       },
       {
-        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
+        "id": "usr_1788375033156",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-04T10:39:04.416Z",
-        "updated_at": "2026-09-04T10:39:04.416Z"
-      },
-      {
-        "id": "usr_1787828512760",
-        "email": "ali@gmaiill.com",
-        "password_hash": "sha256_client_synced",
-        "salt": "salt_client",
-        "is_admin": 0,
-        "created_at": "2026-09-03T17:22:40.212Z",
-        "updated_at": "2026-09-03T17:22:40.212Z"
+        "created_at": "2026-09-02T18:50:33.156Z",
+        "updated_at": "2026-09-02T19:03:48.047Z"
       }
     ],
     "profiles": [
@@ -392,8 +383,8 @@
         "full_name": "Alexander Wright",
         "phone": null,
         "timezone": "America/New_York",
-        "created_at": "2026-09-04T10:39:04.416Z",
-        "updated_at": "2026-09-04T10:39:04.416Z"
+        "created_at": "2026-09-02T17:05:14.559Z",
+        "updated_at": "2026-09-02T17:05:14.560Z"
       },
       {
         "id": "prof_usr_1788364946268",
@@ -401,8 +392,8 @@
         "full_name": "QAISAR AQEEL",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-06T17:13:47.561Z",
-        "updated_at": "2026-09-06T17:13:47.561Z"
+        "created_at": "2026-09-02T17:58:35.341Z",
+        "updated_at": "2026-09-02T17:58:35.341Z"
       },
       {
         "id": "prof_usr_1788370216500",
@@ -421,51 +412,6 @@
         "timezone": "UTC",
         "created_at": "2026-09-02T18:50:33.156Z",
         "updated_at": "2026-09-02T19:03:48.047Z"
-      },
-      {
-        "id": "prof_usr_1787768439248",
-        "user_id": "usr_1787768439248",
-        "full_name": "Muneeb Hassan",
-        "phone": "03115764280",
-        "timezone": "Asia/Karachi",
-        "created_at": "2026-09-03T17:09:53.685Z",
-        "updated_at": "2026-09-03T17:09:53.685Z"
-      },
-      {
-        "id": "prof_usr_1787828512760",
-        "user_id": "usr_1787828512760",
-        "full_name": "ali",
-        "phone": null,
-        "timezone": "UTC",
-        "created_at": "2026-09-03T17:22:40.213Z",
-        "updated_at": "2026-09-03T17:22:40.213Z"
-      },
-      {
-        "id": "prof_usr_1787911754897",
-        "user_id": "usr_1787911754897",
-        "full_name": "Adeel Ikram",
-        "phone": null,
-        "timezone": "UTC",
-        "created_at": "2026-09-06T17:06:20.645Z",
-        "updated_at": "2026-09-06T17:06:20.645Z"
-      },
-      {
-        "id": "prof_usr_1787824456947",
-        "user_id": "usr_1787824456947",
-        "full_name": "Adeel Ikram",
-        "phone": null,
-        "timezone": "UTC",
-        "created_at": "2026-09-06T02:20:30.918Z",
-        "updated_at": "2026-09-06T02:20:30.918Z"
-      },
-      {
-        "id": "prof_usr_1787910716555",
-        "user_id": "usr_1787910716555",
-        "full_name": "SamreenZ",
-        "phone": null,
-        "timezone": "UTC",
-        "created_at": "2026-09-06T13:32:03.756Z",
-        "updated_at": "2026-09-06T13:32:03.756Z"
       }
     ],
     "subscriptions": [
@@ -694,8 +640,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2027-08-23T00:00:00Z",
-        "created_at": "2026-09-04T10:39:04.417Z",
-        "updated_at": "2026-09-04T10:39:04.417Z"
+        "created_at": "2026-09-02T17:05:14.560Z",
+        "updated_at": "2026-09-02T17:05:14.560Z"
       },
       {
         "id": "sub_usr_1788364946268",
@@ -703,8 +649,8 @@
         "plan_id": "FREE",
         "status": "ACTIVE",
         "current_period_end": null,
-        "created_at": "2026-09-06T17:13:47.561Z",
-        "updated_at": "2026-09-06T17:13:47.561Z"
+        "created_at": "2026-09-02T17:58:35.341Z",
+        "updated_at": "2026-09-02T17:58:35.341Z"
       },
       {
         "id": "sub_usr_1788370216500",
@@ -723,51 +669,6 @@
         "current_period_end": null,
         "created_at": "2026-09-02T18:50:33.156Z",
         "updated_at": "2026-09-02T19:03:48.048Z"
-      },
-      {
-        "id": "sub_usr_1787768439248",
-        "user_id": "usr_1787768439248",
-        "plan_id": "FREE",
-        "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-03T17:09:53.685Z",
-        "updated_at": "2026-09-03T17:09:53.685Z"
-      },
-      {
-        "id": "sub_usr_1787828512760",
-        "user_id": "usr_1787828512760",
-        "plan_id": "FREE",
-        "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-03T17:22:40.213Z",
-        "updated_at": "2026-09-03T17:22:40.213Z"
-      },
-      {
-        "id": "sub_usr_1787911754897",
-        "user_id": "usr_1787911754897",
-        "plan_id": "FREE",
-        "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-06T17:06:20.645Z",
-        "updated_at": "2026-09-06T17:06:20.645Z"
-      },
-      {
-        "id": "sub_usr_1787824456947",
-        "user_id": "usr_1787824456947",
-        "plan_id": "PRO_LIFETIME",
-        "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-06T02:20:30.918Z",
-        "updated_at": "2026-09-06T02:20:30.918Z"
-      },
-      {
-        "id": "sub_usr_1787910716555",
-        "user_id": "usr_1787910716555",
-        "plan_id": "FREE",
-        "status": "ACTIVE",
-        "current_period_end": null,
-        "created_at": "2026-09-06T13:32:03.757Z",
-        "updated_at": "2026-09-06T13:32:03.757Z"
       }
     ],
     "documentTypes": [],
@@ -780,12 +681,6 @@
         "name": "Aqeel Family Vault",
         "created_by_user_id": "usr_real_1",
         "created_at": "2026-09-01T00:00:00.000Z"
-      },
-      {
-        "id": "fam_usr_1788364946268",
-        "name": "QAISAR AQEEL's Vault",
-        "created_by_user_id": "usr_1788364946268",
-        "created_at": "2026-09-02T16:02:51.088Z"
       }
     ],
     "familyMembers": [
@@ -816,7 +711,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":62,\"latestVersionName\":\"4.4.2\",\"title\":\"New Update Available\",\"message\":\"Update now to enjoy new features, improved performance, and bug fixes.\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":63,\"latestVersionName\":\"4.4.3\",\"title\":\"New Update Available\",\"message\":\"Update now to enjoy new features, improved performance, and bug fixes.\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
@@ -833,20 +728,6 @@
         "status": "PENDING",
         "expires_at": "2026-09-06T16:15:56.084Z",
         "created_at": "2026-09-02T16:15:56.084Z"
-      },
-      {
-        "id": "inv_1788714864485",
-        "family_group_id": "fam_usr_1788364946268",
-        "owner_user_id": "usr_1788364946268",
-        "owner_name": "QAISAR AQEEL",
-        "email": "tayyba3838@gmail.com",
-        "name": "Tayyba Tabassam",
-        "invite_code": "FAM-90MYYP",
-        "relationship": "Other",
-        "role": "MEMBER",
-        "status": "PENDING",
-        "expires_at": "2026-09-09T17:14:24.485Z",
-        "created_at": "2026-09-06T17:14:24.485Z"
       }
     ]
   }
