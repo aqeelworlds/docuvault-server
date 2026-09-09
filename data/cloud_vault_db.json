@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-09T21:36:09.485Z",
+  "exportedAt": "2026-09-09T21:36:30.418Z",
   "tables": {
     "users": [
       {
@@ -715,8 +715,8 @@
       {
         "id": "fam_usr_real_1",
         "name": "Aqeel World's Family Vault",
-        "created_by_user_id": "usr_real_1",
-        "created_at": "2026-09-07T09:15:01.147Z"
+        "created_by_user_id": "usr_1788364946268",
+        "created_at": "2026-09-09T21:36:29.569Z"
       }
     ],
     "familyMembers": [
@@ -731,6 +731,20 @@
         "status": "ACTIVE",
         "avatar_color": "#4f46e5",
         "created_at": "2026-09-01T00:00:00.000Z"
+      },
+      {
+        "id": "mem_usr_1787824456947",
+        "family_group_id": "fam_usr_real_1",
+        "user_id": "usr_1787824456947",
+        "name": "Adeel Ikram",
+        "email": "adeelpay38@gmail.com",
+        "relationship": "Brother",
+        "role": "MEMBER",
+        "status": "ACTIVE",
+        "avatar_color": "#10b981",
+        "invitation_id": "inv_1788952742995",
+        "invite_code": "FAM-LS55RK",
+        "joined_at": "2026-09-09T21:36:30.417Z"
       }
     ],
     "documentPermissions": [],
@@ -767,9 +781,11 @@
         "invite_code": "FAM-LS55RK",
         "relationship": "Brother",
         "role": "MEMBER",
-        "status": "PENDING",
+        "status": "ACTIVE",
         "expires_at": "2026-09-12T11:19:02.995Z",
-        "created_at": "2026-09-09T11:19:02.995Z"
+        "created_at": "2026-09-09T11:19:02.995Z",
+        "joined_user_id": "usr_1787824456947",
+        "joined_name": "Adeel Ikram"
       }
     ]
   }
