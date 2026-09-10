@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-10T05:16:32.920Z",
+  "exportedAt": "2026-09-10T12:39:23.461Z",
   "tables": {
     "users": [
       {
@@ -44,12 +44,12 @@
         "last_login_at": null
       },
       {
-        "id": "usr_real_5",
+        "id": "usr_1787911754897",
         "email": "adeelworld38@gmail.com",
-        "password_hash": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.TdnNQWXPy/Mcnrl8Bc6NSuYnYjEF/wK",
-        "salt": "$2b$10$AQRqLXTDJ.Abdcn9e5EYc.",
-        "created_at": "2026-09-02T04:01:56.710Z",
-        "updated_at": "2026-09-02T04:01:56.710Z",
+        "password_hash": "sha256_client_synced",
+        "salt": "salt_client",
+        "created_at": "2026-09-10T12:39:23.456Z",
+        "updated_at": "2026-09-10T12:39:23.460Z",
         "is_admin": 0,
         "last_login_at": null
       },
@@ -430,6 +430,15 @@
         "timezone": "UTC",
         "created_at": "2026-09-09T21:36:09.485Z",
         "updated_at": "2026-09-09T21:36:09.485Z"
+      },
+      {
+        "id": "prof_usr_1787911754897",
+        "user_id": "usr_1787911754897",
+        "full_name": "Adeel Ikram",
+        "phone": null,
+        "timezone": "UTC",
+        "created_at": "2026-09-10T12:39:23.461Z",
+        "updated_at": "2026-09-10T12:39:23.461Z"
       }
     ],
     "subscriptions": [
@@ -705,6 +714,15 @@
         "current_period_end": null,
         "created_at": "2026-09-09T21:36:09.485Z",
         "updated_at": "2026-09-09T21:36:09.485Z"
+      },
+      {
+        "id": "sub_usr_1787911754897",
+        "user_id": "usr_1787911754897",
+        "plan_id": "FREE",
+        "status": "ACTIVE",
+        "current_period_end": null,
+        "created_at": "2026-09-10T12:39:23.461Z",
+        "updated_at": "2026-09-10T12:39:23.461Z"
       }
     ],
     "documentTypes": [],
@@ -759,7 +777,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
