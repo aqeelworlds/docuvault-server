@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-10T04:01:09.073Z",
+  "exportedAt": "2026-09-10T04:32:23.743Z",
   "tables": {
     "users": [
       {
@@ -163,13 +163,13 @@
         "updated_at": "2026-09-10T03:13:49.517Z"
       },
       {
-        "id": "usr_1788934577299",
+        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-09T06:16:17.299Z",
-        "updated_at": "2026-09-09T06:16:18.043Z"
+        "created_at": "2026-09-10T04:32:23.743Z",
+        "updated_at": "2026-09-10T04:32:23.743Z"
       }
     ],
     "profiles": [
@@ -383,8 +383,8 @@
         "full_name": "Alexander Wright",
         "phone": null,
         "timezone": "America/New_York",
-        "created_at": "2026-09-09T05:41:50.622Z",
-        "updated_at": "2026-09-09T05:41:50.622Z"
+        "created_at": "2026-09-10T04:32:23.743Z",
+        "updated_at": "2026-09-10T04:32:23.743Z"
       },
       {
         "id": "prof_usr_1788364946268",
@@ -658,8 +658,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2027-08-23T00:00:00Z",
-        "created_at": "2026-09-09T05:41:50.622Z",
-        "updated_at": "2026-09-09T05:41:50.622Z"
+        "created_at": "2026-09-10T04:32:23.743Z",
+        "updated_at": "2026-09-10T04:32:23.743Z"
       },
       {
         "id": "sub_usr_1788364946268",
@@ -759,7 +759,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! 🚀\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! ð\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
