@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-10T03:13:49.517Z",
+  "exportedAt": "2026-09-10T04:01:09.073Z",
   "tables": {
     "users": [
       {
@@ -716,16 +716,16 @@
         "id": "fam_usr_real_1",
         "name": "Aqeel World's Family Vault",
         "created_by_user_id": "usr_1788364946268",
-        "created_at": "2026-09-09T21:36:29.569Z"
+        "created_at": "2026-09-01T00:00:00.000Z"
       }
     ],
     "familyMembers": [
       {
-        "id": "mem_usr_real_1",
+        "id": "mem_owner_usr_1788364946268",
         "family_group_id": "fam_usr_real_1",
-        "user_id": "usr_real_1",
-        "name": "Aqeel World",
-        "email": "aqeelworld38@gmail.com",
+        "user_id": "usr_1788364946268",
+        "name": "QAISAR AQEEL",
+        "email": "aqeelpay38@gmail.com",
         "relationship": "Self (Vault Owner)",
         "role": "OWNER",
         "status": "ACTIVE",
@@ -742,9 +742,7 @@
         "role": "MEMBER",
         "status": "ACTIVE",
         "avatar_color": "#10b981",
-        "invitation_id": "inv_1788952742995",
-        "invite_code": "FAM-LS55RK",
-        "joined_at": "2026-09-09T21:36:30.417Z"
+        "created_at": "2026-09-09T11:19:02.995Z"
       }
     ],
     "documentPermissions": [],
@@ -761,7 +759,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":65,\"latestVersionName\":\"4.4.5\",\"title\":\"New Update Available\",\"message\":\"Update now to enjoy new features, improved performance, and bug fixes.\",\"releaseNotes\":[],\"forceUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! 🚀\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
