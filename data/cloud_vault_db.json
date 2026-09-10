@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-10T12:39:23.461Z",
+  "exportedAt": "2026-09-10T18:03:36.065Z",
   "tables": {
     "users": [
       {
@@ -159,8 +159,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-10T03:13:49.513Z",
-        "updated_at": "2026-09-10T03:13:49.517Z"
+        "created_at": "2026-09-10T18:03:36.064Z",
+        "updated_at": "2026-09-10T18:03:36.064Z"
       },
       {
         "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
@@ -392,8 +392,8 @@
         "full_name": "QAISAR AQEEL",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-10T03:13:49.517Z",
-        "updated_at": "2026-09-10T03:13:49.517Z"
+        "created_at": "2026-09-10T18:03:36.065Z",
+        "updated_at": "2026-09-10T18:03:36.065Z"
       },
       {
         "id": "prof_usr_1788370216500",
@@ -676,8 +676,8 @@
         "plan_id": "FREE",
         "status": "ACTIVE",
         "current_period_end": null,
-        "created_at": "2026-09-10T03:13:49.517Z",
-        "updated_at": "2026-09-10T03:13:49.517Z"
+        "created_at": "2026-09-10T18:03:36.065Z",
+        "updated_at": "2026-09-10T18:03:36.065Z"
       },
       {
         "id": "sub_usr_1788370216500",
@@ -777,7 +777,7 @@
       {
         "id": "app_update_1",
         "key": "app_version_update",
-        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
+        "value": "{\"latestVersionCode\":66,\"latestVersionName\":\"4.4.6\",\"title\":\"DocuVault Update Available! ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ\",\"message\":\"Version 66 brings seamless family vault joining, distinct member emails, and instant background notifications.\",\"releaseNotes\":[\"Accurate owner and member email separation\",\"Distinct member vs owner view and permissions\",\"Instant background notifications when app is minimized\",\"Clear View & Download / Edit permissions on join modal\"],\"forceUpdate\":false,\"activeUpdate\":false,\"playStoreUrl\":\"https://play.google.com/store/apps/details?id=com.docuvault.expirymanager\"}"
       }
     ],
     "familyInvitations": [
