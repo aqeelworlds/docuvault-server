@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-25T11:50:18.243Z",
+  "exportedAt": "2026-09-25T12:01:37.351Z",
   "tables": {
     "users": [
       {
@@ -9,8 +9,8 @@
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 1,
-        "created_at": "2026-09-25T11:50:18.234Z",
-        "updated_at": "2026-09-25T11:50:18.242Z"
+        "created_at": "2026-09-25T12:01:37.350Z",
+        "updated_at": "2026-09-25T12:01:37.350Z"
       },
       {
         "id": "usr_1790335809522",
@@ -29,8 +29,8 @@
         "full_name": "Master Admin",
         "phone": null,
         "timezone": "UTC",
-        "created_at": "2026-09-25T11:50:18.243Z",
-        "updated_at": "2026-09-25T11:50:18.243Z"
+        "created_at": "2026-09-25T12:01:37.350Z",
+        "updated_at": "2026-09-25T12:01:37.350Z"
       },
       {
         "id": "prof_ed558f65-fcde-43da-a230-a7ff39e2fd72",
@@ -64,11 +64,11 @@
       {
         "id": "sub_6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
         "user_id": "6c0ef46d-a36a-4bde-b196-3ef42d4c4a6d",
-        "plan_id": "PRO_YEARLY",
+        "plan_id": "FREE",
         "status": "ACTIVE",
         "current_period_end": "2030-01-01T00:00:00Z",
-        "created_at": "2026-09-25T11:50:18.243Z",
-        "updated_at": "2026-09-25T11:50:18.243Z"
+        "created_at": "2026-09-25T12:01:37.351Z",
+        "updated_at": "2026-09-25T12:01:37.351Z"
       },
       {
         "id": "sub_ed558f65-fcde-43da-a230-a7ff39e2fd72",
