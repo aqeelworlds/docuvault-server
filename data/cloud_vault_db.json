@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-25T12:55:55.823Z",
+  "exportedAt": "2026-09-25T13:10:02.430Z",
   "tables": {
     "users": [
       {
@@ -13,13 +13,13 @@
         "updated_at": "2026-09-25T12:01:37.350Z"
       },
       {
-        "id": "usr_1790335809522",
+        "id": "ed558f65-fcde-43da-a230-a7ff39e2fd72",
         "email": "demo.family@vault.local",
         "password_hash": "sha256_client_synced",
         "salt": "salt_client",
         "is_admin": 0,
-        "created_at": "2026-09-25T11:30:09.522Z",
-        "updated_at": "2026-09-25T11:37:44.718Z"
+        "created_at": "2026-09-25T13:10:02.430Z",
+        "updated_at": "2026-09-25T13:10:02.430Z"
       },
       {
         "id": "usr_1788364946268",
@@ -56,8 +56,8 @@
         "full_name": "Alexander Wright",
         "phone": null,
         "timezone": "America/New_York",
-        "created_at": "2026-09-25T11:11:49.533Z",
-        "updated_at": "2026-09-25T11:11:49.533Z"
+        "created_at": "2026-09-25T13:10:02.430Z",
+        "updated_at": "2026-09-25T13:10:02.430Z"
       },
       {
         "id": "prof_usr_1790335203519",
@@ -112,8 +112,8 @@
         "plan_id": "PRO_YEARLY",
         "status": "ACTIVE",
         "current_period_end": "2027-08-23T00:00:00Z",
-        "created_at": "2026-09-25T11:11:49.533Z",
-        "updated_at": "2026-09-25T11:11:49.533Z"
+        "created_at": "2026-09-25T13:10:02.430Z",
+        "updated_at": "2026-09-25T13:10:02.430Z"
       },
       {
         "id": "sub_usr_1790335203519",
