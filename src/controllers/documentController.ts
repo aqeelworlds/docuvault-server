@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
 import { dbGet, dbRun, dbAll, VAULT_DIR } from '../db/database.js';
+import { persistAttachmentBytes } from './attachmentController.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { AuthorizedDocumentRequest } from '../middleware/authorization.js';
 import { calculateExpiryMetrics, generateReminderDates } from '../services/expiryService.js';
@@ -374,6 +375,7 @@ export async function createDocument(req: AuthenticatedRequest, res: Response): 
           req.file.filename
         ]
       );
+      await persistAttachmentBytes(attachmentId, req.file.path);
     }
 
     // Generate Reminders if expiry is set
@@ -523,6 +525,7 @@ export async function updateDocument(req: AuthorizedDocumentRequest, res: Respon
           req.file.filename
         ]
       );
+      await persistAttachmentBytes(attachmentId, req.file.path);
     }
 
     // If expiry date changed, recalculate all existing active reminders
@@ -706,6 +709,7 @@ export async function renewDocument(req: AuthorizedDocumentRequest, res: Respons
           req.file.filename
         ]
       );
+      await persistAttachmentBytes(attachmentId, req.file.path);
     }
 
     // Reset and recalculate reminders for the new expiry date

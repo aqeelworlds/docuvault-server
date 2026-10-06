@@ -73,7 +73,10 @@ import {
   downloadDatabaseFile,
   restoreFullSystemBackup,
   getAdSettings,
-  updateAdSettings
+  updateAdSettings,
+  getAppUpdateSettings,
+  updateAppUpdateSettings,
+  getPublicAppUpdate
 } from '../controllers/adminController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import {
@@ -183,7 +186,9 @@ router.post('/categories', authenticateToken as any, createCustomCategory as any
 
 // --- SUBSCRIPTIONS & ENTITLEMENTS ---
 router.get('/subscriptions', authenticateToken as any, getSubscription as any);
-router.post('/subscriptions/upgrade', authenticateToken as any, upgradeSubscription as any);
+// Restricted to admins: granting plans without payment must never be
+// available to regular users.
+router.post('/subscriptions/upgrade', authenticateToken as any, requireAdmin as any, upgradeSubscription as any);
 router.post('/subscriptions/verify-purchase', authenticateToken as any, verifyGooglePlayPurchase as any);
 router.post('/subscriptions/restore', authenticateToken as any, restorePurchases as any);
 
@@ -204,6 +209,9 @@ router.get('/admin/backup/db-file', authenticateToken as any, requireAdmin as an
 router.post('/admin/backup/restore', authenticateToken as any, requireAdmin as any, restoreFullSystemBackup as any);
 router.get('/admin/settings/ads', authenticateToken as any, requireAdmin as any, getAdSettings as any);
 router.put('/admin/settings/ads', authenticateToken as any, requireAdmin as any, updateAdSettings as any);
+router.get('/admin/settings/app-update', authenticateToken as any, requireAdmin as any, getAppUpdateSettings as any);
+router.put('/admin/settings/app-update', authenticateToken as any, requireAdmin as any, updateAppUpdateSettings as any);
+router.get('/settings/app-update', getPublicAppUpdate as any);
 
 // --- PUBLIC / APP SETTINGS ---
 router.get('/settings/ads', getAdSettings as any);

@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { dbGet, dbRun } from '../db/database.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
+import { verifyPlayPurchase } from '../services/playVerification.js';
 
 export const PRO_MONTHLY_PRODUCT_ID = process.env.PRO_MONTHLY_PRODUCT_ID || 'vault_pro_monthly';
 export const PRO_YEARLY_PRODUCT_ID = process.env.PRO_YEARLY_PRODUCT_ID || 'vault_pro_yearly';
@@ -215,7 +216,9 @@ export async function upgradeSubscription(req: AuthenticatedRequest, res: Respon
 
 /**
  * Google Play Purchase Verification Endpoint.
- * In production with Google Play credentials, uses Android Publisher API.
+ * Verifies the purchase server-side with Google (when GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+ * is configured) and records it permanently in PostgreSQL so it appears in the
+ * admin panel in real time and survives app updates.
  */
 export async function verifyGooglePlayPurchase(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
@@ -241,10 +244,35 @@ export async function verifyGooglePlayPurchase(req: AuthenticatedRequest, res: R
       return;
     }
 
-    const isYearly = productId === PRO_YEARLY_PRODUCT_ID || productId === 'PRO_YEARLY';
-    const standardPlanId = isYearly ? 'PRO_YEARLY' : 'PRO_MONTHLY';
+    // Server-side verification with Google (when credentials are configured).
+    // null = could not verify (not configured / transient error) -> trust-and-record
+    // {verified:false} = Google rejected it -> refuse.
+    const playCheck = await verifyPlayPurchase(purchaseToken, productId, packageName);
+    if (playCheck && !playCheck.verified) {
+      res.status(402).json({
+        error: 'Google Play could not verify this purchase. Please try again or contact support.',
+        code: 'PLAY_VERIFICATION_FAILED'
+      });
+      return;
+    }
+    const googleVerified = Boolean(playCheck && playCheck.verified);
+
+    const lowerProductId = (productId || '').toLowerCase();
+    const isLifetime =
+      lowerProductId.includes('lifetime') ||
+      productId === 'PRO_LIFETIME' ||
+      productId === PRO_LIFETIME_PRODUCT_ID;
+    const isYearly =
+      !isLifetime && (productId === PRO_YEARLY_PRODUCT_ID || productId === 'PRO_YEARLY');
+    const standardPlanId = isLifetime ? 'PRO_LIFETIME' : isYearly ? 'PRO_YEARLY' : 'PRO_MONTHLY';
     const durationDays = isYearly ? 365 : 30;
-    const periodEnd = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+    const periodEnd = isLifetime
+      ? null
+      : playCheck && playCheck.expiryTimeMillis
+        ? new Date(playCheck.expiryTimeMillis).toISOString()
+        : new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+    const finalOrderId = (playCheck && playCheck.orderId) || orderId || 'GPA.' + Date.now();
 
     const existingSub = await dbGet<{ id: string }>('SELECT id FROM subscriptions WHERE user_id = ?', [userId]);
 
@@ -255,7 +283,7 @@ export async function verifyGooglePlayPurchase(req: AuthenticatedRequest, res: R
           payment_provider = "GOOGLE_PLAY", order_id = ?, purchase_token = ?,
           updated_at = CURRENT_TIMESTAMP
          WHERE user_id = ?`,
-        [standardPlanId, periodEnd, orderId || 'GPA.' + Date.now(), purchaseToken, userId]
+        [standardPlanId, periodEnd, finalOrderId, purchaseToken, userId]
       );
     } else {
       await dbRun(
@@ -263,22 +291,24 @@ export async function verifyGooglePlayPurchase(req: AuthenticatedRequest, res: R
           id, user_id, plan_id, status, current_period_end,
           payment_provider, order_id, purchase_token
         ) VALUES (?, ?, ?, "ACTIVE", ?, "GOOGLE_PLAY", ?, ?)`,
-        [uuidv4(), userId, standardPlanId, periodEnd, orderId || 'GPA.' + Date.now(), purchaseToken]
+        [uuidv4(), userId, standardPlanId, periodEnd, finalOrderId, purchaseToken]
       );
     }
 
     // Record activity
     await dbRun(
       'INSERT INTO activity_history (id, user_id, action_type, description) VALUES (?, ?, ?, ?)',
-      [uuidv4(), userId, 'UPDATED', `Verified Google Play purchase for ${standardPlanId}`]
+      [uuidv4(), userId, 'UPDATED', `Verified Google Play purchase for ${standardPlanId}${googleVerified ? ' (Google-verified)' : ''}`]
     );
 
     res.json({
       verified: true,
+      googleVerified,
       message: 'Google Play subscription verified and activated!',
       planId: standardPlanId,
       status: 'ACTIVE',
-      currentPeriodEnd: periodEnd
+      currentPeriodEnd: periodEnd,
+      isLifetime
     });
   } catch (error: any) {
     console.error('verifyGooglePlayPurchase error:', error);

@@ -5,9 +5,53 @@ import { dbGet, dbRun, VAULT_DIR } from '../db/database.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { getDocumentAccess } from '../middleware/authorization.js';
 
+/**
+ * Persist uploaded file bytes into the database (document_attachments.file_data).
+ * The serverless filesystem (/tmp on Vercel) is wiped constantly, so files saved
+ * to disk alone would be lost. Bytes in PostgreSQL survive forever.
+ */
+export async function persistAttachmentBytes(attachmentId: string, diskPath: string): Promise<void> {
+  try {
+    if (!diskPath || !fs.existsSync(diskPath)) return;
+    const data = fs.readFileSync(diskPath);
+    if (!data || data.length === 0) return;
+    await dbRun('UPDATE document_attachments SET file_data = ? WHERE id = ?', [data, attachmentId]);
+  } catch (e: any) {
+    console.warn('[Attachments] file_data persist notice:', e?.message || e);
+  }
+}
+
+/** Serve bytes from the database when the disk copy is gone (serverless /tmp wipe). */
+async function sendFromDatabase(
+  res: Response,
+  attachmentId: string,
+  fileName: string,
+  mimeType: string,
+  disposition: 'inline' | 'attachment'
+): Promise<boolean> {
+  try {
+    const row = await dbGet<{ file_data: Buffer }>(
+      'SELECT file_data FROM document_attachments WHERE id = ?',
+      [attachmentId]
+    );
+    const buf = row?.file_data ? Buffer.from(row.file_data as any) : null;
+    if (!buf || buf.length === 0) return false;
+    res.setHeader('Content-Type', mimeType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `${disposition}; filename="${encodeURIComponent(path.basename(fileName))}"`);
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Length', String(buf.length));
+    res.send(buf);
+    return true;
+  } catch (e: any) {
+    console.warn('[Attachments] db fallback notice:', e?.message || e);
+    return false;
+  }
+}
+
 export async function viewAttachment(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    const attachmentId = req.params.id;
+    const attachmentId = req.params.id as string;
     const userId = req.user!.id;
 
     const attachment = await dbGet<{
@@ -41,7 +85,11 @@ export async function viewAttachment(req: AuthenticatedRequest, res: Response): 
     }
 
     if (!fs.existsSync(fullPath)) {
-      res.status(404).json({ error: 'Attachment file not found on disk' });
+      // Disk copy gone (e.g. serverless /tmp wipe) -> serve bytes stored in DB.
+      const served = await sendFromDatabase(res, attachmentId, attachment.file_name, attachment.mime_type, 'inline');
+      if (!served) {
+        res.status(404).json({ error: 'Attachment file not found' });
+      }
       return;
     }
 
@@ -61,7 +109,7 @@ export async function viewAttachment(req: AuthenticatedRequest, res: Response): 
 
 export async function downloadAttachment(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    const attachmentId = req.params.id;
+    const attachmentId = req.params.id as string;
     const userId = req.user!.id;
 
     const attachment = await dbGet<{
@@ -95,7 +143,11 @@ export async function downloadAttachment(req: AuthenticatedRequest, res: Respons
     }
 
     if (!fs.existsSync(fullPath)) {
-      res.status(404).json({ error: 'Attachment file not found on disk' });
+      // Disk copy gone (e.g. serverless /tmp wipe) -> serve bytes stored in DB.
+      const served = await sendFromDatabase(res, attachmentId, attachment.file_name, attachment.mime_type, 'attachment');
+      if (!served) {
+        res.status(404).json({ error: 'Attachment file not found' });
+      }
       return;
     }
 
@@ -114,7 +166,7 @@ export async function downloadAttachment(req: AuthenticatedRequest, res: Respons
 
 export async function deleteAttachment(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    const attachmentId = req.params.id;
+    const attachmentId = req.params.id as string;
     const userId = req.user!.id;
 
     const attachment = await dbGet<{

@@ -1,16 +1,14 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
-import { dbGet, dbRun, dbAll, DB_PATH } from '../db/database.js';
+import { dbGet, dbRun, dbAll, dbTransaction, DB_PATH, USE_POSTGRES } from '../db/database.js';
 import { AuthenticatedRequest, hashPassword } from '../middleware/auth.js';
-import { ensureFreshData, queueCloudSync, syncToCloudNow } from '../db/cloudSync.js';
 
 /**
  * Overview statistics for Admin Dashboard.
  */
 export async function getAdminStats(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    await ensureFreshData(true);
     const totalUsersRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com"');
     const totalDocsRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM documents WHERE is_archived = 0 AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
     const totalArchivedRow = await dbGet<{ count: number }>('SELECT COUNT(*) as count FROM documents WHERE is_archived = 1 AND user_id IN (SELECT id FROM users WHERE email NOT LIKE "%@vault.local" AND email NOT LIKE "%@evil.local" AND email NOT LIKE "%@example.com")');
@@ -90,7 +88,6 @@ export async function getAdminStats(req: AuthenticatedRequest, res: Response): P
  */
 export async function getAllUsers(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    await ensureFreshData(true);
     const q = (req.query.q as string || '').toLowerCase().trim();
     const planFilter = req.query.plan as string;
 
@@ -198,7 +195,6 @@ export async function updateUserSubscription(req: AuthenticatedRequest, res: Res
     );
 
     try {
-      await syncToCloudNow();
     } catch {}
 
     res.json({
@@ -233,7 +229,6 @@ export async function resetUserPassword(req: AuthenticatedRequest, res: Response
     );
 
     try {
-      await syncToCloudNow();
     } catch {}
 
     res.json({ message: 'User password reset successfully' });
@@ -264,7 +259,6 @@ export async function updateUserProfile(req: AuthenticatedRequest, res: Response
     }
 
     try {
-      await syncToCloudNow();
     } catch {}
 
     res.json({ message: 'User profile updated successfully by admin' });
@@ -289,7 +283,6 @@ export async function deleteUserByAdmin(req: AuthenticatedRequest, res: Response
     await dbRun('DELETE FROM users WHERE id = ?', [targetUserId]);
 
     try {
-      await syncToCloudNow();
     } catch {}
 
     res.json({ message: 'User and all associated data permanently deleted by admin' });
@@ -361,6 +354,39 @@ export async function exportFullSystemBackup(req: AuthenticatedRequest, res: Res
  */
 export async function downloadDatabaseFile(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
+    // PostgreSQL mode: generate a portable .sql dump (there is no .db file).
+    if (USE_POSTGRES) {
+      const dumpTables = [
+        'users', 'profiles', 'document_types', 'family_groups', 'family_members',
+        'documents', 'document_permissions', 'reminders', 'renewal_history',
+        'activity_history', 'subscriptions', 'notification_preferences',
+        'family_invitations', 'password_resets', 'app_settings'
+      ];
+      const esc = (v: any): string => {
+        if (v === null || v === undefined) return 'NULL';
+        if (typeof v === 'number') return String(v);
+        if (Buffer.isBuffer(v)) return `'\\x${v.toString('hex')}'`;
+        return `'${String(v).replace(/'/g, "''")}'`;
+      };
+      let sql = `-- DocuVault database dump (${new Date().toISOString()})\n`;
+      for (const t of dumpTables) {
+        try {
+          const rows = await dbAll<any>(`SELECT * FROM ${t}`);
+          for (const row of rows) {
+            // Skip bulky file bytes in the dump (metadata is enough for restore).
+            if ('file_data' in row) delete row.file_data;
+            const cols = Object.keys(row);
+            if (cols.length === 0) continue;
+            sql += `INSERT INTO ${t} (${cols.join(', ')}) VALUES (${cols.map((c) => esc(row[c])).join(', ')});\n`;
+          }
+        } catch {}
+      }
+      res.setHeader('Content-Type', 'application/sql');
+      res.setHeader('Content-Disposition', `attachment; filename="document_vault_${new Date().toISOString().split('T')[0]}.sql"`);
+      res.send(sql);
+      return;
+    }
+
     if (!fs.existsSync(DB_PATH)) {
       res.status(404).json({ error: 'Database file not found on server' });
       return;
@@ -406,13 +432,11 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
     let restoredDocs = 0;
     let restoredSubs = 0;
 
-    await dbRun('BEGIN TRANSACTION');
-
-    try {
+    const restoreCounts = await dbTransaction(async (tx) => {
       // Restore Users
       for (const u of users) {
         if (!u.id || !u.email) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO users (id, email, password_hash, salt, is_admin, created_at, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO UPDATE SET
@@ -436,7 +460,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Profiles
       for (const p of profiles) {
         if (!p.user_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO profiles (id, user_id, full_name, avatar_url, phone, timezone, app_lock_enabled, app_lock_pin_hash, biometric_enabled, created_at, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(user_id) DO UPDATE SET
@@ -467,7 +491,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       for (const cat of categories) {
         if (!cat.id) continue;
         const isCustomVal = cat.is_custom !== undefined ? (cat.is_custom ? 1 : 0) : (cat.is_system ? 0 : 1);
-        await dbRun(
+        await tx.run(
           `INSERT INTO document_types (id, user_id, name, slug, icon, color, is_custom, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO NOTHING`,
@@ -487,7 +511,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Family Groups
       for (const fg of familyGroups) {
         if (!fg.id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO family_groups (id, name, created_by_user_id, created_at)
            VALUES (?, ?, ?, ?)
            ON CONFLICT(id) DO UPDATE SET name = excluded.name`,
@@ -503,7 +527,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Family Members
       for (const fm of familyMembers) {
         if (!fm.id || !fm.family_group_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO family_members (id, family_group_id, user_id, name, email, relationship, role, avatar_color, status, invitation_id, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO UPDATE SET
@@ -531,7 +555,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Documents
       for (const doc of documents) {
         if (!doc.id || !doc.user_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO documents (
             id, user_id, family_group_id, owner_member_id, name, document_type_id,
             document_number, issue_date, expiry_date, has_no_expiry, issuing_authority,
@@ -570,7 +594,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Subscriptions
       for (const sub of subscriptions) {
         if (!sub.user_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO subscriptions (id, user_id, plan_id, status, current_period_end, payment_provider, created_at, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(user_id) DO UPDATE SET
@@ -595,7 +619,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Reminders
       for (const r of reminders) {
         if (!r.id || !r.document_id || !r.user_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO reminders (id, document_id, user_id, lead_days, reminder_date, is_active, is_triggered, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO NOTHING`,
@@ -615,7 +639,7 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
       // Restore Permissions
       for (const p of permissions) {
         if (!p.id || !p.document_id || !p.shared_with_member_id) continue;
-        await dbRun(
+        await tx.run(
           `INSERT INTO document_permissions (id, document_id, shared_with_member_id, permission_level, granted_by_user_id, created_at)
            VALUES (?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO NOTHING`,
@@ -630,19 +654,14 @@ export async function restoreFullSystemBackup(req: AuthenticatedRequest, res: Re
         );
       }
 
-      await dbRun('COMMIT');
+      return { restoredUsers, restoredDocs, restoredSubs };
+    });
 
-      res.json({
-        success: true,
-        message: `System restored successfully! Restored ${restoredUsers} users, ${restoredDocs} documents, and ${restoredSubs} subscriptions.`,
-        restoredUsers,
-        restoredDocs,
-        restoredSubs
-      });
-    } catch (innerErr) {
-      await dbRun('ROLLBACK');
-      throw innerErr;
-    }
+    res.json({
+      success: true,
+      message: `System restored successfully! Restored ${restoreCounts.restoredUsers} users, ${restoreCounts.restoredDocs} documents, and ${restoreCounts.restoredSubs} subscriptions.`,
+      ...restoreCounts
+    });
   } catch (error: any) {
     console.error('restoreFullSystemBackup error:', error);
     res.status(500).json({ error: 'Failed to restore system backup', details: error.message });
@@ -658,19 +677,29 @@ export async function getAdSettings(req: Request, res: Response): Promise<void> 
     if (!row) {
       res.json({
         adsEnabled: true,
-        adProvider: 'AdMob',
+        adProvider: 'Google AdMob',
         bannerAdsEnabled: true,
         interstitialAdsEnabled: true,
-        interstitialFrequency: 3,
-        admobAppId: 'ca-app-pub-3940256099942544~3347511713',
-        admobBannerId: 'ca-app-pub-3940256099942544/6300978111',
-        admobInterstitialId: 'ca-app-pub-3940256099942544/1033173712',
+        interstitialFrequency: 4,
+        admobAppId: 'ca-app-pub-5627427473987267~8764890721',
+        admobBannerId: 'ca-app-pub-5627427473987267/2522916000',
+        admobInterstitialId: 'ca-app-pub-5627427473987267/8656156070',
         customBannerText: 'Upgrade to DocuVault Pro — 100% Ad-Free, Unlimited Docs & Family Sharing',
         customBannerActionUrl: '/subscription'
       });
       return;
     }
-    res.json(JSON.parse(row.value));
+    const parsed = JSON.parse(row.value);
+    if (!parsed.admobAppId || parsed.admobAppId.includes('3940256099942544')) {
+      parsed.admobAppId = 'ca-app-pub-5627427473987267~8764890721';
+    }
+    if (!parsed.admobBannerId || parsed.admobBannerId.includes('3940256099942544')) {
+      parsed.admobBannerId = 'ca-app-pub-5627427473987267/2522916000';
+    }
+    if (!parsed.admobInterstitialId || parsed.admobInterstitialId.includes('3940256099942544')) {
+      parsed.admobInterstitialId = 'ca-app-pub-5627427473987267/8656156070';
+    }
+    res.json(parsed);
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch ad settings', details: error.message });
   }
@@ -694,3 +723,51 @@ export async function updateAdSettings(req: AuthenticatedRequest, res: Response)
   }
 }
 
+
+/**
+ * App-update broadcast settings (replaces the old GitHub-JSON mechanism).
+ * The admin panel writes the "new version available" config here; the app
+ * polls the public endpoint below.
+ */
+export async function getAppUpdateSettings(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const row = await dbGet<{ value: string }>('SELECT value FROM app_settings WHERE key = \'app_version_update\'');
+    if (!row || !row.value) {
+      res.json(null);
+      return;
+    }
+    res.json(JSON.parse(row.value));
+  } catch (error: any) {
+    console.error('getAppUpdateSettings error:', error);
+    res.status(500).json({ error: 'Failed to fetch app update settings', details: error.message });
+  }
+}
+
+export async function updateAppUpdateSettings(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const settings = req.body || {};
+    await dbRun(
+      `INSERT INTO app_settings (key, value, updated_at) VALUES ('app_version_update', ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`,
+      [JSON.stringify(settings)]
+    );
+    res.json({ success: true, message: 'App update broadcast saved', settings });
+  } catch (error: any) {
+    console.error('updateAppUpdateSettings error:', error);
+    res.status(500).json({ error: 'Failed to save app update settings', details: error.message });
+  }
+}
+
+/** Public (no login required): lets the app check for a broadcasted update. */
+export async function getPublicAppUpdate(req: Request, res: Response): Promise<void> {
+  try {
+    const row = await dbGet<{ value: string }>('SELECT value FROM app_settings WHERE key = \'app_version_update\'');
+    if (!row || !row.value) {
+      res.json(null);
+      return;
+    }
+    res.json(JSON.parse(row.value));
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to fetch app update info' });
+  }
+}

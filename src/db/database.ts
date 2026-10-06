@@ -2,12 +2,115 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import os from 'os';
+/**
+ * DATABASE STRATEGY
+ * -----------------
+ * If DATABASE_URL is set (e.g. Supabase / Neon Postgres), PostgreSQL is used as the
+ * single persistent source of truth. This is REQUIRED on serverless hosts (Vercel),
+ * where the local filesystem (and therefore SQLite) is ephemeral and wiped constantly.
+ *
+ * If DATABASE_URL is NOT set, the code falls back to local SQLite (dev / legacy mode).
+ */
 
+export const USE_POSTGRES = !!process.env.DATABASE_URL;
+
+// ---------------------------------------------------------------------------
+// Postgres plumbing
+// ---------------------------------------------------------------------------
+import pg from 'pg';
+
+const { Pool } = pg;
+let pgPool: pg.Pool | null = null;
+
+function getPgPool(): pg.Pool {
+  if (!pgPool) {
+    pgPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      // Supabase / Neon require SSL; keep it lenient for managed hosts.
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    });
+    pgPool.on('error', (err) => console.error('[DocuVault DB] pg pool error:', err.message));
+  }
+  return pgPool;
+}
+
+/**
+ * Translate SQLite-flavoured SQL to Postgres:
+ *  - `?` placeholders  -> `$1, $2, ...` (outside string literals)
+ *  - `"literal"`       -> `'literal'`   (this codebase never uses " for identifiers)
+ *  - DATETIME          -> TIMESTAMP
+ *
+ * Exported for automated tests.
+ */
+export function toPostgres(sql: string): string {
+  let out = '';
+  let i = 0;
+  let idx = 1;
+  let quote: string | null = null;
+  while (i < sql.length) {
+    const c = sql[i];
+    if (quote) {
+      if (c === quote) {
+        // '' inside a string is an escaped quote: keep both chars as-is.
+        if (sql[i + 1] === quote) {
+          out += c + sql[i + 1];
+          i += 2;
+          continue;
+        }
+        // Closing quote: convert a double-quoted string literal to single quotes.
+        out += quote === '"' ? "'" : quote;
+        quote = null;
+        i++;
+        continue;
+      }
+      out += c;
+      i++;
+      continue;
+    }
+    if (c === "'") {
+      out += c;
+      quote = "'";
+      i++;
+      continue;
+    }
+    if (c === '"') {
+      out += "'";
+      quote = '"';
+      i++;
+      continue;
+    }
+    if (c === '?') {
+      out += '$' + idx++;
+      i++;
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  out = out.replace(/\bDATETIME\b/gi, 'TIMESTAMP');
+  return out;
+}
+
+function isPragmaTableInfo(sql: string): string | null {
+  const m = /^\s*PRAGMA\s+table_info\s*\(\s*["'`\[]?(\w+)["'`\]]?\s*\)\s*;?\s*$/i.exec(sql);
+  return m ? m[1] : null;
+}
+
+function isPragmaNoop(sql: string): boolean {
+  return /^\s*PRAGMA\s/i.test(sql);
+}
+
+// ---------------------------------------------------------------------------
+// SQLite plumbing (legacy / local dev)
+// ---------------------------------------------------------------------------
 const BUNDLED_STORAGE_DIR = path.resolve(__dirname, '../../storage');
 
 const isBundledWritable = () => {
@@ -60,8 +163,23 @@ export function getDb(): sqlite3.Database {
   return dbInstance;
 }
 
+// ---------------------------------------------------------------------------
+// Unified query API (works with Postgres or SQLite)
+// ---------------------------------------------------------------------------
+
 // Promise wrapper for db.run
 export function dbRun(sql: string, params: any[] = []): Promise<{ lastID: number; changes: number }> {
+  if (USE_POSTGRES) {
+    if (isPragmaNoop(sql)) return Promise.resolve({ lastID: 0, changes: 0 });
+    const pgSql = toPostgres(sql);
+    return getPgPool()
+      .query(pgSql, params)
+      .then((res) => ({ lastID: 0, changes: res.rowCount ?? 0 }))
+      .catch((err) => {
+        console.error('[DocuVault DB] pg dbRun failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+        throw err;
+      });
+  }
   const db = getDb();
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (this: sqlite3.RunResult, err: Error | null) {
@@ -73,6 +191,20 @@ export function dbRun(sql: string, params: any[] = []): Promise<{ lastID: number
 
 // Promise wrapper for db.get
 export function dbGet<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+  if (USE_POSTGRES) {
+    const table = isPragmaTableInfo(sql);
+    const pgSql = table
+      ? `SELECT column_name AS name FROM information_schema.columns WHERE table_name = '${table}'`
+      : toPostgres(sql);
+    const pgParams = table ? [] : params;
+    return getPgPool()
+      .query(pgSql, pgParams)
+      .then((res) => (res.rows[0] ? (res.rows[0] as T) : null))
+      .catch((err) => {
+        console.error('[DocuVault DB] pg dbGet failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+        throw err;
+      });
+  }
   const db = getDb();
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err: Error | null, row: any) => {
@@ -84,6 +216,20 @@ export function dbGet<T = any>(sql: string, params: any[] = []): Promise<T | nul
 
 // Promise wrapper for db.all
 export function dbAll<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  if (USE_POSTGRES) {
+    const table = isPragmaTableInfo(sql);
+    const pgSql = table
+      ? `SELECT column_name AS name FROM information_schema.columns WHERE table_name = '${table}'`
+      : toPostgres(sql);
+    const pgParams = table ? [] : params;
+    return getPgPool()
+      .query(pgSql, pgParams)
+      .then((res) => (res.rows || []) as T[])
+      .catch((err) => {
+        console.error('[DocuVault DB] pg dbAll failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+        throw err;
+      });
+  }
   const db = getDb();
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err: Error | null, rows: any[]) => {
@@ -95,6 +241,17 @@ export function dbAll<T = any>(sql: string, params: any[] = []): Promise<T[]> {
 
 // Promise wrapper for db.exec
 export function dbExec(sql: string): Promise<void> {
+  if (USE_POSTGRES) {
+    if (isPragmaNoop(sql)) return Promise.resolve();
+    const pgSql = toPostgres(sql);
+    return getPgPool()
+      .query(pgSql)
+      .then(() => undefined)
+      .catch((err) => {
+        console.error('[DocuVault DB] pg dbExec failed:', err.message);
+        throw err;
+      });
+  }
   const db = getDb();
   return new Promise((resolve, reject) => {
     db.exec(sql, (err: Error | null) => {
@@ -104,11 +261,68 @@ export function dbExec(sql: string): Promise<void> {
   });
 }
 
-export async function initDatabase(): Promise<void> {
-  const db = getDb();
+export interface TxClient {
+  run: (sql: string, params?: any[]) => Promise<{ lastID: number; changes: number }>;
+  get: <T = any>(sql: string, params?: any[]) => Promise<T | null>;
+  all: <T = any>(sql: string, params?: any[]) => Promise<T[]>;
+}
 
-  // Enable foreign keys
-  await dbRun('PRAGMA foreign_keys = ON');
+/**
+ * Run a function inside a real database transaction.
+ * On Postgres this checks out ONE pooled client for the whole transaction
+ * (BEGIN/COMMIT across separate pool.query calls would silently break).
+ */
+export async function dbTransaction<T>(fn: (tx: TxClient) => Promise<T>): Promise<T> {
+  if (USE_POSTGRES) {
+    const client = await getPgPool().connect();
+    try {
+      await client.query('BEGIN');
+      const tx: TxClient = {
+        run: async (sql, params = []) => {
+          const res = await client.query(toPostgres(sql), params);
+          return { lastID: 0, changes: res.rowCount ?? 0 };
+        },
+        get: async <T = any>(sql: string, params: any[] = []): Promise<T | null> => {
+          const res = await client.query(toPostgres(sql), params);
+          return res.rows[0] ? (res.rows[0] as T) : null;
+        },
+        all: async <T = any>(sql: string, params: any[] = []): Promise<T[]> => {
+          const res = await client.query(toPostgres(sql), params);
+          return (res.rows || []) as T[];
+        },
+      };
+      const result = await fn(tx);
+      await client.query('COMMIT');
+      return result;
+    } catch (e) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {}
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+  await dbRun('BEGIN TRANSACTION');
+  try {
+    const result = await fn({ run: dbRun, get: dbGet, all: dbAll });
+    await dbRun('COMMIT');
+    return result;
+  } catch (e) {
+    try {
+      await dbRun('ROLLBACK');
+    } catch {}
+    throw e;
+  }
+}
+
+export async function initDatabase(): Promise<void> {
+  if (!USE_POSTGRES) {
+    const db = getDb();
+    // Enable foreign keys
+    await dbRun('PRAGMA foreign_keys = ON');
+    void db;
+  }
 
   const schema = `
     CREATE TABLE IF NOT EXISTS users (
@@ -350,7 +564,8 @@ export async function initDatabase(): Promise<void> {
     console.warn('Ad settings init warning:', e);
   }
 
-  // Safe migration for is_archived and archived_at
+  // Safe migration for columns added after initial release.
+  // (PRAGMA table_info is transparently translated for Postgres.)
   try {
     const tableInfo = await dbAll<{ name: string }>('PRAGMA table_info(documents)');
     const colNames = tableInfo.map(c => c.name);
@@ -366,17 +581,23 @@ export async function initDatabase(): Promise<void> {
     if (!subColNames.includes('payment_provider')) {
       await dbRun('ALTER TABLE subscriptions ADD COLUMN payment_provider TEXT DEFAULT "DIRECT"');
     }
-
-    const invInfo = await dbAll<{ name: string }>('PRAGMA table_info(family_invitations)');
-    const invColNames = invInfo.map(c => c.name);
-    if (!invColNames.includes('invite_code')) {
-      await dbRun('ALTER TABLE family_invitations ADD COLUMN invite_code TEXT');
-    }
     if (!subColNames.includes('order_id')) {
       await dbRun('ALTER TABLE subscriptions ADD COLUMN order_id TEXT');
     }
     if (!subColNames.includes('purchase_token')) {
       await dbRun('ALTER TABLE subscriptions ADD COLUMN purchase_token TEXT');
+    }
+    if (!subColNames.includes('current_period_start')) {
+      await dbRun('ALTER TABLE subscriptions ADD COLUMN current_period_start TEXT');
+    }
+    if (!subColNames.includes('cancel_at_period_end')) {
+      await dbRun('ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end INTEGER DEFAULT 0');
+    }
+
+    const invInfo = await dbAll<{ name: string }>('PRAGMA table_info(family_invitations)');
+    const invColNames = invInfo.map(c => c.name);
+    if (!invColNames.includes('invite_code')) {
+      await dbRun('ALTER TABLE family_invitations ADD COLUMN invite_code TEXT');
     }
 
     const fmInfo = await dbAll<{ name: string }>('PRAGMA table_info(family_members)');
@@ -400,11 +621,14 @@ export async function initDatabase(): Promise<void> {
       await dbRun('ALTER TABLE users ADD COLUMN last_login_at DATETIME');
     }
 
-    if (!subColNames.includes('current_period_start')) {
-      await dbRun('ALTER TABLE subscriptions ADD COLUMN current_period_start TEXT');
-    }
-    if (!subColNames.includes('cancel_at_period_end')) {
-      await dbRun('ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end INTEGER DEFAULT 0');
+    // Persistent attachment bytes: keeps uploaded files safe even when the
+    // serverless filesystem is wiped (Vercel /tmp is ephemeral).
+    const attInfo = await dbAll<{ name: string }>('PRAGMA table_info(document_attachments)');
+    const attColNames = attInfo.map(c => c.name);
+    if (!attColNames.includes('file_data')) {
+      await dbRun(USE_POSTGRES
+        ? 'ALTER TABLE document_attachments ADD COLUMN file_data BYTEA'
+        : 'ALTER TABLE document_attachments ADD COLUMN file_data BLOB');
     }
 
     // Grant admin role ONLY to official docuvault.app.help@gmail.com
@@ -443,5 +667,5 @@ export async function initDatabase(): Promise<void> {
     }
   }
 
-  console.log('✅ Document Vault SQLite database initialized with full schema and seed categories.');
+  console.log(`✅ Document Vault database initialized (${USE_POSTGRES ? 'PostgreSQL' : 'SQLite'}) with full schema and seed categories.`);
 }
