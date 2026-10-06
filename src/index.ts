@@ -68,18 +68,29 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-// Initialize DB, Seed Demo, and start listening
+// Initialize DB, Seed Demo, and start listening (standalone) or prepare for serverless
 async function bootstrap() {
   try {
     await initDatabase();
     await seedDemoData();
-    app.listen(PORT, () => {
-      console.log(`🚀 Document Vault Server running at http://localhost:${PORT}`);
-    });
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`🚀 Document Vault Server running at http://localhost:${PORT}`);
+      });
+    } else {
+      console.log('✅ Document Vault initialized for Vercel serverless');
+    }
   } catch (error) {
     console.error('Fatal initialization error:', error);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
+    // On Vercel: keep the function alive so Vercel sees the export;
+    // individual requests will surface DB errors in logs.
   }
 }
 
-bootstrap();
+void bootstrap();
+
+// Export the Express app so Vercel (@vercel/node) treats this as a serverless function.
+export default app;
