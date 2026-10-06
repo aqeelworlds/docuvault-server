@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import apiRouter from '../dist/routes/api.js';
 import { initDatabase, dbGet, dbRun, dbAll } from '../dist/db/database.js';
+import { adminUpgradeUser } from './helpers.js';
 
 const PORT = 5098;
 const BASE_URL = `http://localhost:${PORT}/api`;
@@ -160,14 +161,8 @@ describe('PHASE 10: Password Reset Recovery & Shared Documents Test Suite', () =
 
     it('Upgrades user to Pro and creates document + family member', async () => {
       // Upgrade to pro
-      const upRes = await request('/subscriptions/upgrade', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: { planId: 'PRO_MONTHLY' }
-      });
-      assert.equal(upRes.status, 200);
-
-      // Get category id
+      await adminUpgradeUser(request, token, 'PRO_MONTHLY');
+// Get category id
       const cat = await dbGet('SELECT id FROM document_types LIMIT 1');
       assert.ok(cat);
 

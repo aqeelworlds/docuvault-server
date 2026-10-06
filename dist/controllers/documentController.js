@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
 import { dbGet, dbRun, dbAll, VAULT_DIR } from '../db/database.js';
+import { persistAttachmentBytes } from './attachmentController.js';
 import { calculateExpiryMetrics, generateReminderDates } from '../services/expiryService.js';
 import { checkUserIsPro } from './subscriptionController.js';
 export async function getDocuments(req, res) {
@@ -304,6 +305,7 @@ export async function createDocument(req, res) {
                 req.file.mimetype,
                 req.file.filename
             ]);
+            await persistAttachmentBytes(attachmentId, req.file.path);
         }
         // Generate Reminders if expiry is set
         if (!isNoExpiry && expiryDate) {
@@ -415,6 +417,7 @@ export async function updateDocument(req, res) {
                 req.file.mimetype,
                 req.file.filename
             ]);
+            await persistAttachmentBytes(attachmentId, req.file.path);
         }
         // If expiry date changed, recalculate all existing active reminders
         if (expiryChanged) {
@@ -543,6 +546,7 @@ export async function renewDocument(req, res) {
                 req.file.mimetype,
                 req.file.filename
             ]);
+            await persistAttachmentBytes(attachmentId, req.file.path);
         }
         // Reset and recalculate reminders for the new expiry date
         const existingReminders = await dbAll('SELECT id, lead_days FROM reminders WHERE document_id = ?', [documentId]);

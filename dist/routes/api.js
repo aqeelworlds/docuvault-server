@@ -7,7 +7,7 @@ import { getReminders, toggleReminder, createCustomReminder, deleteReminder } fr
 import { getCategories, createCustomCategory } from '../controllers/categoryController.js';
 import { getSubscription, upgradeSubscription, verifyGooglePlayPurchase, restorePurchases } from '../controllers/subscriptionController.js';
 import { exportVaultData, syncVaultData, importVaultData } from '../controllers/backupController.js';
-import { getAdminStats, getAllUsers, updateUserSubscription, resetUserPassword, updateUserProfile, deleteUserByAdmin, exportFullSystemBackup, downloadDatabaseFile, restoreFullSystemBackup, getAdSettings, updateAdSettings } from '../controllers/adminController.js';
+import { getAdminStats, getAllUsers, updateUserSubscription, resetUserPassword, updateUserProfile, deleteUserByAdmin, exportFullSystemBackup, downloadDatabaseFile, restoreFullSystemBackup, getAdSettings, updateAdSettings, getAppUpdateSettings, updateAppUpdateSettings, getPublicAppUpdate, logNotification, getUserNotifications } from '../controllers/adminController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { requireDocumentView, requireDocumentEdit, requireDocumentOwner } from '../middleware/authorization.js';
 import { uploadAttachment } from '../middleware/upload.js';
@@ -102,9 +102,13 @@ router.get('/categories', authenticateToken, getCategories);
 router.post('/categories', authenticateToken, createCustomCategory);
 // --- SUBSCRIPTIONS & ENTITLEMENTS ---
 router.get('/subscriptions', authenticateToken, getSubscription);
-router.post('/subscriptions/upgrade', authenticateToken, upgradeSubscription);
+// Restricted to admins: granting plans without payment must never be
+// available to regular users.
+router.post('/subscriptions/upgrade', authenticateToken, requireAdmin, upgradeSubscription);
 router.post('/subscriptions/verify-purchase', authenticateToken, verifyGooglePlayPurchase);
 router.post('/subscriptions/restore', authenticateToken, restorePurchases);
+// --- NOTIFICATION LOGGING (client reports scheduled/delivered local notifications) ---
+router.post('/notifications/log', authenticateToken, logNotification);
 // --- DATA BACKUP & EXPORT ---
 router.get('/backup/export', authenticateToken, exportVaultData);
 router.post('/backup/sync', authenticateToken, syncVaultData);
@@ -119,8 +123,12 @@ router.delete('/admin/users/:id', authenticateToken, requireAdmin, deleteUserByA
 router.get('/admin/backup/export', authenticateToken, requireAdmin, exportFullSystemBackup);
 router.get('/admin/backup/db-file', authenticateToken, requireAdmin, downloadDatabaseFile);
 router.post('/admin/backup/restore', authenticateToken, requireAdmin, restoreFullSystemBackup);
+router.get('/admin/users/:id/notifications', authenticateToken, requireAdmin, getUserNotifications);
 router.get('/admin/settings/ads', authenticateToken, requireAdmin, getAdSettings);
 router.put('/admin/settings/ads', authenticateToken, requireAdmin, updateAdSettings);
+router.get('/admin/settings/app-update', authenticateToken, requireAdmin, getAppUpdateSettings);
+router.put('/admin/settings/app-update', authenticateToken, requireAdmin, updateAppUpdateSettings);
+router.get('/settings/app-update', getPublicAppUpdate);
 // --- PUBLIC / APP SETTINGS ---
 router.get('/settings/ads', getAdSettings);
 // --- SUPPORT & HELP INQUIRY ---

@@ -419,15 +419,43 @@ describe('5. Free vs Pro Subscription Entitlements', () => {
   });
 
   test('Upgrades user to Document Vault Pro', async () => {
-    const upgradeRes = await apiRequest('/subscriptions/upgrade', {
+    // Security: non-admin direct upgrade must be rejected (403)
+    const blocked = await apiRequest('/subscriptions/upgrade', {
       method: 'POST',
       headers: { Authorization: `Bearer ${tokenUser}` },
       body: { planId: 'PRO_MONTHLY' }
     });
+    assert.equal(blocked.status, 403);
+
+    // Admin upgrades the user via the admin endpoint
+    let adminToken;
+    const adminReg = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: { email: 'aqeelpay38@gmail.com', password: 'Password123!', fullName: 'Test Admin' }
+    });
+    if (adminReg.status === 201) {
+      adminToken = adminReg.data.token;
+    } else {
+      const adminLogin = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: { email: 'aqeelpay38@gmail.com', password: 'Password123!' }
+      });
+      assert.equal(adminLogin.status, 200);
+      adminToken = adminLogin.data.token;
+    }
+
+    const meRes = await apiRequest('/auth/me', {
+      headers: { Authorization: `Bearer ${tokenUser}` }
+    });
+    const targetUserId = meRes.data.user.id;
+
+    const upgradeRes = await apiRequest(`/admin/users/${targetUserId}/subscription`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${adminToken}` },
+      body: { planId: 'PRO_MONTHLY', status: 'ACTIVE' }
+    });
 
     assert.equal(upgradeRes.status, 200);
-    assert.equal(upgradeRes.data.planId, 'PRO_MONTHLY');
-    assert.equal(upgradeRes.data.status, 'ACTIVE');
   });
 
   test('Allows Pro user to add 6th document without limits', async () => {

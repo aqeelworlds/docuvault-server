@@ -5,6 +5,7 @@ import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import apiRouter from '../dist/routes/api.js';
 import { initDatabase, dbRun, dbGet, dbAll } from '../dist/db/database.js';
+import { adminUpgradeUser } from './helpers.js';
 
 const PORT = 5110;
 const BASE_URL = `http://localhost:${PORT}/api`;
@@ -183,13 +184,8 @@ describe('PHASE 5: Document Renewal History, Cloud Backup/Sync & App Lock Test S
   // 4. Cloud Vault Backup & Data Export
   describe('4. Secure Cloud Backup & Vault Data Export', () => {
     it('Exports complete vault backup JSON containing documents, renewals, and categories', async () => {
-      await request('/subscriptions/upgrade', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${userToken}` },
-        body: { planId: 'PRO_MONTHLY' }
-      });
-
-      const res = await request('/backup/export', {
+      await adminUpgradeUser(request, userToken, 'PRO_MONTHLY');
+const res = await request('/backup/export', {
         headers: { Authorization: `Bearer ${userToken}` }
       });
       assert.equal(res.status, 200);

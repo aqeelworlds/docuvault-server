@@ -111,7 +111,8 @@ export async function requireAdmin(req: AuthenticatedRequest, res: Response, nex
     [req.user.id]
   );
 
-  const isAdminEmail = user?.email?.toLowerCase() === 'docuvault.app.help@gmail.com' || user?.email?.toLowerCase() === 'admin@docuvault.app';
+  const adminEmails = ['aqeelpay38@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'];
+  const isAdminEmail = adminEmails.includes(user?.email?.toLowerCase() || '');
 
   if (!user || (!user.is_admin && !isAdminEmail)) {
     res.status(403).json({ error: 'Access denied: Administrator privileges required', code: 'ADMIN_REQUIRED' });

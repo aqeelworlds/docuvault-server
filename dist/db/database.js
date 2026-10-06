@@ -2,9 +2,105 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import os from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import os from 'os';
+/**
+ * DATABASE STRATEGY
+ * -----------------
+ * If DATABASE_URL is set (e.g. Supabase / Neon Postgres), PostgreSQL is used as the
+ * single persistent source of truth. This is REQUIRED on serverless hosts (Vercel),
+ * where the local filesystem (and therefore SQLite) is ephemeral and wiped constantly.
+ *
+ * If DATABASE_URL is NOT set, the code falls back to local SQLite (dev / legacy mode).
+ */
+export const USE_POSTGRES = !!process.env.DATABASE_URL;
+// ---------------------------------------------------------------------------
+// Postgres plumbing
+// ---------------------------------------------------------------------------
+import pg from 'pg';
+const { Pool } = pg;
+let pgPool = null;
+function getPgPool() {
+    if (!pgPool) {
+        pgPool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            // Supabase / Neon require SSL; keep it lenient for managed hosts.
+            ssl: { rejectUnauthorized: false },
+            max: 5,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
+        });
+        pgPool.on('error', (err) => console.error('[DocuVault DB] pg pool error:', err.message));
+    }
+    return pgPool;
+}
+/**
+ * Translate SQLite-flavoured SQL to Postgres:
+ *  - `?` placeholders  -> `$1, $2, ...` (outside string literals)
+ *  - `"literal"`       -> `'literal'`   (this codebase never uses " for identifiers)
+ *  - DATETIME          -> TIMESTAMP
+ *
+ * Exported for automated tests.
+ */
+export function toPostgres(sql) {
+    let out = '';
+    let i = 0;
+    let idx = 1;
+    let quote = null;
+    while (i < sql.length) {
+        const c = sql[i];
+        if (quote) {
+            if (c === quote) {
+                // '' inside a string is an escaped quote: keep both chars as-is.
+                if (sql[i + 1] === quote) {
+                    out += c + sql[i + 1];
+                    i += 2;
+                    continue;
+                }
+                // Closing quote: convert a double-quoted string literal to single quotes.
+                out += quote === '"' ? "'" : quote;
+                quote = null;
+                i++;
+                continue;
+            }
+            out += c;
+            i++;
+            continue;
+        }
+        if (c === "'") {
+            out += c;
+            quote = "'";
+            i++;
+            continue;
+        }
+        if (c === '"') {
+            out += "'";
+            quote = '"';
+            i++;
+            continue;
+        }
+        if (c === '?') {
+            out += '$' + idx++;
+            i++;
+            continue;
+        }
+        out += c;
+        i++;
+    }
+    out = out.replace(/\bDATETIME\b/gi, 'TIMESTAMP');
+    return out;
+}
+function isPragmaTableInfo(sql) {
+    const m = /^\s*PRAGMA\s+table_info\s*\(\s*["'`\[]?(\w+)["'`\]]?\s*\)\s*;?\s*$/i.exec(sql);
+    return m ? m[1] : null;
+}
+function isPragmaNoop(sql) {
+    return /^\s*PRAGMA\s/i.test(sql);
+}
+// ---------------------------------------------------------------------------
+// SQLite plumbing (legacy / local dev)
+// ---------------------------------------------------------------------------
 const BUNDLED_STORAGE_DIR = path.resolve(__dirname, '../../storage');
 const isBundledWritable = () => {
     try {
@@ -52,8 +148,23 @@ export function getDb() {
     }
     return dbInstance;
 }
+// ---------------------------------------------------------------------------
+// Unified query API (works with Postgres or SQLite)
+// ---------------------------------------------------------------------------
 // Promise wrapper for db.run
 export function dbRun(sql, params = []) {
+    if (USE_POSTGRES) {
+        if (isPragmaNoop(sql))
+            return Promise.resolve({ lastID: 0, changes: 0 });
+        const pgSql = toPostgres(sql);
+        return getPgPool()
+            .query(pgSql, params)
+            .then((res) => ({ lastID: 0, changes: res.rowCount ?? 0 }))
+            .catch((err) => {
+            console.error('[DocuVault DB] pg dbRun failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+            throw err;
+        });
+    }
     const db = getDb();
     return new Promise((resolve, reject) => {
         db.run(sql, params, function (err) {
@@ -65,6 +176,20 @@ export function dbRun(sql, params = []) {
 }
 // Promise wrapper for db.get
 export function dbGet(sql, params = []) {
+    if (USE_POSTGRES) {
+        const table = isPragmaTableInfo(sql);
+        const pgSql = table
+            ? `SELECT column_name AS name FROM information_schema.columns WHERE table_name = '${table}'`
+            : toPostgres(sql);
+        const pgParams = table ? [] : params;
+        return getPgPool()
+            .query(pgSql, pgParams)
+            .then((res) => (res.rows[0] ? res.rows[0] : null))
+            .catch((err) => {
+            console.error('[DocuVault DB] pg dbGet failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+            throw err;
+        });
+    }
     const db = getDb();
     return new Promise((resolve, reject) => {
         db.get(sql, params, (err, row) => {
@@ -76,6 +201,20 @@ export function dbGet(sql, params = []) {
 }
 // Promise wrapper for db.all
 export function dbAll(sql, params = []) {
+    if (USE_POSTGRES) {
+        const table = isPragmaTableInfo(sql);
+        const pgSql = table
+            ? `SELECT column_name AS name FROM information_schema.columns WHERE table_name = '${table}'`
+            : toPostgres(sql);
+        const pgParams = table ? [] : params;
+        return getPgPool()
+            .query(pgSql, pgParams)
+            .then((res) => (res.rows || []))
+            .catch((err) => {
+            console.error('[DocuVault DB] pg dbAll failed:', err.message, '| SQL:', pgSql.slice(0, 160));
+            throw err;
+        });
+    }
     const db = getDb();
     return new Promise((resolve, reject) => {
         db.all(sql, params, (err, rows) => {
@@ -87,6 +226,18 @@ export function dbAll(sql, params = []) {
 }
 // Promise wrapper for db.exec
 export function dbExec(sql) {
+    if (USE_POSTGRES) {
+        if (isPragmaNoop(sql))
+            return Promise.resolve();
+        const pgSql = toPostgres(sql);
+        return getPgPool()
+            .query(pgSql)
+            .then(() => undefined)
+            .catch((err) => {
+            console.error('[DocuVault DB] pg dbExec failed:', err.message);
+            throw err;
+        });
+    }
     const db = getDb();
     return new Promise((resolve, reject) => {
         db.exec(sql, (err) => {
@@ -96,10 +247,66 @@ export function dbExec(sql) {
         });
     });
 }
+/**
+ * Run a function inside a real database transaction.
+ * On Postgres this checks out ONE pooled client for the whole transaction
+ * (BEGIN/COMMIT across separate pool.query calls would silently break).
+ */
+export async function dbTransaction(fn) {
+    if (USE_POSTGRES) {
+        const client = await getPgPool().connect();
+        try {
+            await client.query('BEGIN');
+            const tx = {
+                run: async (sql, params = []) => {
+                    const res = await client.query(toPostgres(sql), params);
+                    return { lastID: 0, changes: res.rowCount ?? 0 };
+                },
+                get: async (sql, params = []) => {
+                    const res = await client.query(toPostgres(sql), params);
+                    return res.rows[0] ? res.rows[0] : null;
+                },
+                all: async (sql, params = []) => {
+                    const res = await client.query(toPostgres(sql), params);
+                    return (res.rows || []);
+                },
+            };
+            const result = await fn(tx);
+            await client.query('COMMIT');
+            return result;
+        }
+        catch (e) {
+            try {
+                await client.query('ROLLBACK');
+            }
+            catch { }
+            throw e;
+        }
+        finally {
+            client.release();
+        }
+    }
+    await dbRun('BEGIN TRANSACTION');
+    try {
+        const result = await fn({ run: dbRun, get: dbGet, all: dbAll });
+        await dbRun('COMMIT');
+        return result;
+    }
+    catch (e) {
+        try {
+            await dbRun('ROLLBACK');
+        }
+        catch { }
+        throw e;
+    }
+}
 export async function initDatabase() {
-    const db = getDb();
-    // Enable foreign keys
-    await dbRun('PRAGMA foreign_keys = ON');
+    if (!USE_POSTGRES) {
+        const db = getDb();
+        // Enable foreign keys
+        await dbRun('PRAGMA foreign_keys = ON');
+        void db;
+    }
     const schema = `
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -271,6 +478,21 @@ export async function initDatabase() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
+    -- Per-user notification delivery log (admin can see when/how many notifications each user got)
+    CREATE TABLE IF NOT EXISTS notification_log (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'reminder',
+      title TEXT,
+      body TEXT,
+      channel TEXT NOT NULL DEFAULT 'local',
+      status TEXT NOT NULL DEFAULT 'scheduled',
+      document_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_notification_log_user ON notification_log(user_id, created_at DESC);
+
     CREATE TABLE IF NOT EXISTS family_invitations (
       id TEXT PRIMARY KEY,
       family_group_id TEXT NOT NULL,
@@ -338,7 +560,8 @@ export async function initDatabase() {
     catch (e) {
         console.warn('Ad settings init warning:', e);
     }
-    // Safe migration for is_archived and archived_at
+    // Safe migration for columns added after initial release.
+    // (PRAGMA table_info is transparently translated for Postgres.)
     try {
         const tableInfo = await dbAll('PRAGMA table_info(documents)');
         const colNames = tableInfo.map(c => c.name);
@@ -353,16 +576,22 @@ export async function initDatabase() {
         if (!subColNames.includes('payment_provider')) {
             await dbRun('ALTER TABLE subscriptions ADD COLUMN payment_provider TEXT DEFAULT "DIRECT"');
         }
-        const invInfo = await dbAll('PRAGMA table_info(family_invitations)');
-        const invColNames = invInfo.map(c => c.name);
-        if (!invColNames.includes('invite_code')) {
-            await dbRun('ALTER TABLE family_invitations ADD COLUMN invite_code TEXT');
-        }
         if (!subColNames.includes('order_id')) {
             await dbRun('ALTER TABLE subscriptions ADD COLUMN order_id TEXT');
         }
         if (!subColNames.includes('purchase_token')) {
             await dbRun('ALTER TABLE subscriptions ADD COLUMN purchase_token TEXT');
+        }
+        if (!subColNames.includes('current_period_start')) {
+            await dbRun('ALTER TABLE subscriptions ADD COLUMN current_period_start TEXT');
+        }
+        if (!subColNames.includes('cancel_at_period_end')) {
+            await dbRun('ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end INTEGER DEFAULT 0');
+        }
+        const invInfo = await dbAll('PRAGMA table_info(family_invitations)');
+        const invColNames = invInfo.map(c => c.name);
+        if (!invColNames.includes('invite_code')) {
+            await dbRun('ALTER TABLE family_invitations ADD COLUMN invite_code TEXT');
         }
         const fmInfo = await dbAll('PRAGMA table_info(family_members)');
         const fmColNames = fmInfo.map(c => c.name);
@@ -383,15 +612,18 @@ export async function initDatabase() {
         if (!userColNames.includes('last_login_at')) {
             await dbRun('ALTER TABLE users ADD COLUMN last_login_at DATETIME');
         }
-        if (!subColNames.includes('current_period_start')) {
-            await dbRun('ALTER TABLE subscriptions ADD COLUMN current_period_start TEXT');
+        // Persistent attachment bytes: keeps uploaded files safe even when the
+        // serverless filesystem is wiped (Vercel /tmp is ephemeral).
+        const attInfo = await dbAll('PRAGMA table_info(document_attachments)');
+        const attColNames = attInfo.map(c => c.name);
+        if (!attColNames.includes('file_data')) {
+            await dbRun(USE_POSTGRES
+                ? 'ALTER TABLE document_attachments ADD COLUMN file_data BYTEA'
+                : 'ALTER TABLE document_attachments ADD COLUMN file_data BLOB');
         }
-        if (!subColNames.includes('cancel_at_period_end')) {
-            await dbRun('ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end INTEGER DEFAULT 0');
-        }
-        // Grant admin role ONLY to official docuvault.app.help@gmail.com
+        // Grant admin role to official admin emails
         await dbRun('UPDATE users SET is_admin = 0');
-        await dbRun('UPDATE users SET is_admin = 1 WHERE email IN ("docuvault.app.help@gmail.com", "admin@docuvault.app")');
+        await dbRun('UPDATE users SET is_admin = 1 WHERE email IN ("docuvault.app.help@gmail.com", "admin@docuvault.app", "aqeelpay38@gmail.com")');
     }
     catch (migErr) {
         console.error('Migration check notice:', migErr);
@@ -418,5 +650,5 @@ export async function initDatabase() {
             await dbRun('INSERT INTO document_types (id, name, slug, icon, color, is_custom, user_id) VALUES (?, ?, ?, ?, ?, 0, NULL)', [cat.id, cat.name, cat.slug, cat.icon, cat.color]);
         }
     }
-    console.log('✅ Document Vault SQLite database initialized with full schema and seed categories.');
+    console.log(`✅ Document Vault database initialized (${USE_POSTGRES ? 'PostgreSQL' : 'SQLite'}) with full schema and seed categories.`);
 }

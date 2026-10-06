@@ -34,8 +34,10 @@ export async function register(req, res) {
         const subscriptionId = uuidv4();
         const notifPrefId = uuidv4();
         const { hash, salt } = await hashPassword(password);
+        // Grant admin role to official admin emails at registration time
+        const isAdminNewUser = ['aqeelpay38@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(normalizedEmail);
         // Insert user
-        await dbRun('INSERT INTO users (id, email, password_hash, salt) VALUES (?, ?, ?, ?)', [userId, normalizedEmail, hash, salt]);
+        await dbRun('INSERT INTO users (id, email, password_hash, salt, is_admin) VALUES (?, ?, ?, ?, ?)', [userId, normalizedEmail, hash, salt, isAdminNewUser ? 1 : 0]);
         // Insert profile
         await dbRun('INSERT INTO profiles (id, user_id, full_name) VALUES (?, ?, ?)', [profileId, userId, fullName.trim()]);
         // Insert default family group & owner member
@@ -90,16 +92,17 @@ export async function login(req, res) {
             'adeelpay38@gmail.com', 'adeelworld38@gmail.com', 'connectwithaqeel@gmail.com',
             'hassanmunib120@gmail.com', 'makramkarsal@gmail.com', 'qaisaraqeel1995@gmail.com',
             'qaisaraqeel2@gmail.com', 'sa574354@gmail.com', 'samreenzahra38383@gmail.com',
-            'tayyba3838@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'
+            'tayyba3838@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app',
+            'aqeelpay38@gmail.com'
         ]);
         if (!user) {
             if (KNOWN_TESTERS.has(normalizedEmail)) {
                 const userId = 'usr_' + Date.now();
                 const { hash, salt } = await hashPassword(password);
-                await dbRun('INSERT INTO users (id, email, password_hash, salt, is_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [userId, normalizedEmail, hash, salt, (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app') ? 1 : 0, new Date().toISOString(), new Date().toISOString()]);
+                await dbRun('INSERT INTO users (id, email, password_hash, salt, is_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [userId, normalizedEmail, hash, salt, (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com') ? 1 : 0, new Date().toISOString(), new Date().toISOString()]);
                 await dbRun('INSERT INTO profiles (id, user_id, full_name, timezone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', ['prof_' + userId, userId, normalizedEmail.split('@')[0], 'UTC', new Date().toISOString(), new Date().toISOString()]);
                 await dbRun('INSERT INTO subscriptions (id, user_id, plan_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', ['sub_' + userId, userId, 'FREE', 'ACTIVE', new Date().toISOString(), new Date().toISOString()]);
-                user = { id: userId, email: normalizedEmail, password_hash: hash, salt, is_admin: (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app') ? 1 : 0 };
+                user = { id: userId, email: normalizedEmail, password_hash: hash, salt, is_admin: (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com') ? 1 : 0 };
             }
             else {
                 res.status(401).json({ error: 'No account found with this email. Please check your spelling or register.' });
@@ -123,9 +126,10 @@ export async function login(req, res) {
         const profile = await dbGet('SELECT full_name, avatar_url, phone, timezone, app_lock_enabled, app_lock_pin_hash, biometric_enabled FROM profiles WHERE user_id = ?', [user.id]);
         const subscription = await dbGet('SELECT plan_id, status, current_period_end FROM subscriptions WHERE user_id = ?', [user.id]);
         const familyMember = await dbGet('SELECT id, family_group_id FROM family_members WHERE user_id = ?', [user.id]);
-        const isAdmin = Boolean((user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app')) ||
+        const isAdmin = Boolean((user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com')) ||
             normalizedEmail === 'docuvault.app.help@gmail.com' ||
-            normalizedEmail === 'admin@docuvault.app');
+            normalizedEmail === 'admin@docuvault.app' ||
+            normalizedEmail === 'aqeelpay38@gmail.com');
         const token = generateToken({
             id: user.id,
             email: user.email,

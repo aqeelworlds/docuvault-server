@@ -44,10 +44,13 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     const { hash, salt } = await hashPassword(password);
 
+    // Grant admin role to official admin emails at registration time
+    const isAdminNewUser = ['aqeelpay38@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'].includes(normalizedEmail);
+
     // Insert user
     await dbRun(
-      'INSERT INTO users (id, email, password_hash, salt) VALUES (?, ?, ?, ?)',
-      [userId, normalizedEmail, hash, salt]
+      'INSERT INTO users (id, email, password_hash, salt, is_admin) VALUES (?, ?, ?, ?, ?)',
+      [userId, normalizedEmail, hash, salt, isAdminNewUser ? 1 : 0]
     );
 
     // Insert profile
@@ -135,7 +138,8 @@ export async function login(req: Request, res: Response): Promise<void> {
       'adeelpay38@gmail.com', 'adeelworld38@gmail.com', 'connectwithaqeel@gmail.com',
       'hassanmunib120@gmail.com', 'makramkarsal@gmail.com', 'qaisaraqeel1995@gmail.com',
       'qaisaraqeel2@gmail.com', 'sa574354@gmail.com', 'samreenzahra38383@gmail.com',
-      'tayyba3838@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'
+      'tayyba3838@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app',
+      'aqeelpay38@gmail.com'
     ]);
 
     if (!user) {
@@ -144,7 +148,7 @@ export async function login(req: Request, res: Response): Promise<void> {
         const { hash, salt } = await hashPassword(password);
         await dbRun(
           'INSERT INTO users (id, email, password_hash, salt, is_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [userId, normalizedEmail, hash, salt, (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app') ? 1 : 0, new Date().toISOString(), new Date().toISOString()]
+          [userId, normalizedEmail, hash, salt, (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com') ? 1 : 0, new Date().toISOString(), new Date().toISOString()]
         );
         await dbRun(
           'INSERT INTO profiles (id, user_id, full_name, timezone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
@@ -154,7 +158,7 @@ export async function login(req: Request, res: Response): Promise<void> {
           'INSERT INTO subscriptions (id, user_id, plan_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
           ['sub_' + userId, userId, 'FREE', 'ACTIVE', new Date().toISOString(), new Date().toISOString()]
         );
-        user = { id: userId, email: normalizedEmail, password_hash: hash, salt, is_admin: (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app') ? 1 : 0 };
+        user = { id: userId, email: normalizedEmail, password_hash: hash, salt, is_admin: (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com') ? 1 : 0 };
       } else {
         res.status(401).json({ error: 'No account found with this email. Please check your spelling or register.' });
         return;
@@ -197,9 +201,10 @@ export async function login(req: Request, res: Response): Promise<void> {
     );
 
     const isAdmin = Boolean(
-      (user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app')) ||
+      (user.is_admin && (normalizedEmail === 'docuvault.app.help@gmail.com' || normalizedEmail === 'admin@docuvault.app' || normalizedEmail === 'aqeelpay38@gmail.com')) ||
       normalizedEmail === 'docuvault.app.help@gmail.com' ||
-      normalizedEmail === 'admin@docuvault.app'
+      normalizedEmail === 'admin@docuvault.app' ||
+      normalizedEmail === 'aqeelpay38@gmail.com'
     );
 
     const token = generateToken({

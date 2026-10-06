@@ -495,6 +495,21 @@ export async function initDatabase(): Promise<void> {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
+    -- Per-user notification delivery log (admin can see when/how many notifications each user got)
+    CREATE TABLE IF NOT EXISTS notification_log (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'reminder',
+      title TEXT,
+      body TEXT,
+      channel TEXT NOT NULL DEFAULT 'local',
+      status TEXT NOT NULL DEFAULT 'scheduled',
+      document_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_notification_log_user ON notification_log(user_id, created_at DESC);
+
     CREATE TABLE IF NOT EXISTS family_invitations (
       id TEXT PRIMARY KEY,
       family_group_id TEXT NOT NULL,
@@ -631,10 +646,10 @@ export async function initDatabase(): Promise<void> {
         : 'ALTER TABLE document_attachments ADD COLUMN file_data BLOB');
     }
 
-    // Grant admin role ONLY to official docuvault.app.help@gmail.com
+    // Grant admin role to official admin emails
     await dbRun('UPDATE users SET is_admin = 0');
     await dbRun(
-      'UPDATE users SET is_admin = 1 WHERE email IN ("docuvault.app.help@gmail.com", "admin@docuvault.app")'
+      'UPDATE users SET is_admin = 1 WHERE email IN ("docuvault.app.help@gmail.com", "admin@docuvault.app", "aqeelpay38@gmail.com")'
     );
   } catch (migErr) {
     console.error('Migration check notice:', migErr);

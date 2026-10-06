@@ -76,7 +76,9 @@ import {
   updateAdSettings,
   getAppUpdateSettings,
   updateAppUpdateSettings,
-  getPublicAppUpdate
+  getPublicAppUpdate,
+  logNotification,
+  getUserNotifications
 } from '../controllers/adminController.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import {
@@ -192,6 +194,9 @@ router.post('/subscriptions/upgrade', authenticateToken as any, requireAdmin as 
 router.post('/subscriptions/verify-purchase', authenticateToken as any, verifyGooglePlayPurchase as any);
 router.post('/subscriptions/restore', authenticateToken as any, restorePurchases as any);
 
+// --- NOTIFICATION LOGGING (client reports scheduled/delivered local notifications) ---
+router.post('/notifications/log', authenticateToken as any, logNotification as any);
+
 // --- DATA BACKUP & EXPORT ---
 router.get('/backup/export', authenticateToken as any, exportVaultData as any);
 router.post('/backup/sync', authenticateToken as any, syncVaultData as any);
@@ -207,6 +212,7 @@ router.delete('/admin/users/:id', authenticateToken as any, requireAdmin as any,
 router.get('/admin/backup/export', authenticateToken as any, requireAdmin as any, exportFullSystemBackup as any);
 router.get('/admin/backup/db-file', authenticateToken as any, requireAdmin as any, downloadDatabaseFile as any);
 router.post('/admin/backup/restore', authenticateToken as any, requireAdmin as any, restoreFullSystemBackup as any);
+router.get('/admin/users/:id/notifications', authenticateToken as any, requireAdmin as any, getUserNotifications as any);
 router.get('/admin/settings/ads', authenticateToken as any, requireAdmin as any, getAdSettings as any);
 router.put('/admin/settings/ads', authenticateToken as any, requireAdmin as any, updateAdSettings as any);
 router.get('/admin/settings/app-update', authenticateToken as any, requireAdmin as any, getAppUpdateSettings as any);

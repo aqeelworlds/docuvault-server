@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import apiRouter from '../dist/routes/api.js';
 import { initDatabase, dbRun, dbGet, dbAll } from '../dist/db/database.js';
 import { calculateExpiryMetrics, differenceInCalendarDays, generateReminderDates } from '../dist/services/expiryService.js';
+import { adminUpgradeUser } from './helpers.js';
 
 const PORT = 5126;
 const BASE_URL = `http://localhost:${PORT}/api`;
@@ -133,14 +134,8 @@ describe('PHASE 9: Complete QA, Stress Testing, Performance & Edge-Case Hardenin
     });
 
     it('Step 5: Upgrades to Pro and adds a family member profile', async () => {
-      const upRes = await request('/subscriptions/upgrade', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${userToken}` },
-        body: { planId: 'PRO_YEARLY' }
-      });
-      assert.equal(upRes.status, 200);
-
-      const memRes = await request('/family/members', {
+      await adminUpgradeUser(request, userToken, 'PRO_YEARLY');
+const memRes = await request('/family/members', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${userToken}` },
         body: {

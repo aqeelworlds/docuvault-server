@@ -5,6 +5,7 @@ import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import apiRouter from '../dist/routes/api.js';
 import { initDatabase, dbRun, dbGet, dbAll } from '../dist/db/database.js';
+import { adminUpgradeUser } from './helpers.js';
 
 const PORT = 5092;
 const BASE_URL = `http://localhost:${PORT}/api`;
@@ -66,13 +67,8 @@ describe('PHASE 4: Family Vault, Family Members & Secure Sharing Test Suite', ()
     userAId = resA.data.user.id;
 
     // Upgrade User A to Pro
-    await request('/subscriptions/upgrade', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${userAToken}` },
-      body: { planId: 'PRO_MONTHLY' }
-    });
-
-    // Register User B (Invited Spouse)
+    await adminUpgradeUser(request, userAToken, 'PRO_MONTHLY');
+// Register User B (Invited Spouse)
     userBEmail = `spouse_user_${Date.now()}@vault.local`;
     const resB = await request('/auth/register', {
       method: 'POST',

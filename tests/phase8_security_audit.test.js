@@ -5,6 +5,7 @@ import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import apiRouter from '../dist/routes/api.js';
 import { initDatabase, dbRun, dbGet, dbAll } from '../dist/db/database.js';
+import { adminUpgradeUser } from './helpers.js';
 
 const PORT = 5124;
 const BASE_URL = `http://localhost:${PORT}/api`;
@@ -205,13 +206,8 @@ describe('PHASE 8: Security, Privacy & Data Protection Audit Test Suite', () => 
   describe('3. Instant Revocation & Access Control Invariants', () => {
     it('User A upgrades to Pro and shares Document A with User B (VIEW)', async () => {
       // Upgrade User A to Pro to enable family sharing
-      await request('/subscriptions/upgrade', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${userA_Token}` },
-        body: { planId: 'PRO_YEARLY' }
-      });
-
-      // User A invites User B
+      await adminUpgradeUser(request, userA_Token, 'PRO_YEARLY');
+// User A invites User B
       const invRes = await request('/family/invite', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${userA_Token}` },

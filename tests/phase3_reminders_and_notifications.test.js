@@ -101,11 +101,30 @@ describe('PHASE 3: Expiry Reminders & Android Notification Integration Test Suit
   // 2. Custom Reminder Addition & Validation
   describe('2. Custom Reminder Addition & Validation', () => {
     it('Adds a 45-day custom reminder for the document', async () => {
-      await request('/subscriptions/upgrade', {
+      // Upgrade via admin (direct /subscriptions/upgrade is admin-only since the security fix)
+      let adminToken;
+      const adminReg = await request('/auth/register', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${userToken}` },
-        body: { planId: 'PRO_MONTHLY' }
+        body: { email: 'aqeelpay38@gmail.com', password: 'Password123!', fullName: 'Test Admin' }
       });
+      if (adminReg.status === 201) {
+        adminToken = adminReg.data.token;
+      } else {
+        const adminLogin = await request('/auth/login', {
+          method: 'POST',
+          body: { email: 'aqeelpay38@gmail.com', password: 'Password123!' }
+        });
+        adminToken = adminLogin.data.token;
+      }
+      const meRes = await request('/auth/me', {
+        headers: { Authorization: `Bearer ${userToken}` }
+      });
+      const upgradeRes = await request(`/admin/users/${meRes.data.user.id}/subscription`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: { planId: 'PRO_MONTHLY', status: 'ACTIVE' }
+      });
+      assert.equal(upgradeRes.status, 200);
 
       const res = await request('/reminders/custom', {
         method: 'POST',

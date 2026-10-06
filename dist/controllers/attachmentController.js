@@ -2,6 +2,44 @@ import path from 'path';
 import fs from 'fs';
 import { dbGet, dbRun, VAULT_DIR } from '../db/database.js';
 import { getDocumentAccess } from '../middleware/authorization.js';
+/**
+ * Persist uploaded file bytes into the database (document_attachments.file_data).
+ * The serverless filesystem (/tmp on Vercel) is wiped constantly, so files saved
+ * to disk alone would be lost. Bytes in PostgreSQL survive forever.
+ */
+export async function persistAttachmentBytes(attachmentId, diskPath) {
+    try {
+        if (!diskPath || !fs.existsSync(diskPath))
+            return;
+        const data = fs.readFileSync(diskPath);
+        if (!data || data.length === 0)
+            return;
+        await dbRun('UPDATE document_attachments SET file_data = ? WHERE id = ?', [data, attachmentId]);
+    }
+    catch (e) {
+        console.warn('[Attachments] file_data persist notice:', e?.message || e);
+    }
+}
+/** Serve bytes from the database when the disk copy is gone (serverless /tmp wipe). */
+async function sendFromDatabase(res, attachmentId, fileName, mimeType, disposition) {
+    try {
+        const row = await dbGet('SELECT file_data FROM document_attachments WHERE id = ?', [attachmentId]);
+        const buf = row?.file_data ? Buffer.from(row.file_data) : null;
+        if (!buf || buf.length === 0)
+            return false;
+        res.setHeader('Content-Type', mimeType || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `${disposition}; filename="${encodeURIComponent(path.basename(fileName))}"`);
+        res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Content-Length', String(buf.length));
+        res.send(buf);
+        return true;
+    }
+    catch (e) {
+        console.warn('[Attachments] db fallback notice:', e?.message || e);
+        return false;
+    }
+}
 export async function viewAttachment(req, res) {
     try {
         const attachmentId = req.params.id;
@@ -26,7 +64,11 @@ export async function viewAttachment(req, res) {
             return;
         }
         if (!fs.existsSync(fullPath)) {
-            res.status(404).json({ error: 'Attachment file not found on disk' });
+            // Disk copy gone (e.g. serverless /tmp wipe) -> serve bytes stored in DB.
+            const served = await sendFromDatabase(res, attachmentId, attachment.file_name, attachment.mime_type, 'inline');
+            if (!served) {
+                res.status(404).json({ error: 'Attachment file not found' });
+            }
             return;
         }
         // Secure Response Headers to prevent XSS / MIME sniffing
@@ -66,7 +108,11 @@ export async function downloadAttachment(req, res) {
             return;
         }
         if (!fs.existsSync(fullPath)) {
-            res.status(404).json({ error: 'Attachment file not found on disk' });
+            // Disk copy gone (e.g. serverless /tmp wipe) -> serve bytes stored in DB.
+            const served = await sendFromDatabase(res, attachmentId, attachment.file_name, attachment.mime_type, 'attachment');
+            if (!served) {
+                res.status(404).json({ error: 'Attachment file not found' });
+            }
             return;
         }
         res.setHeader('Content-Type', attachment.mime_type || 'application/octet-stream');

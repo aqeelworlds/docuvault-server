@@ -97,7 +97,9 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response): Pro
         p.full_name, p.phone, p.timezone, p.app_lock_enabled,
         s.plan_id, s.status as subscription_status, s.current_period_end, s.payment_provider,
         fg.name as family_name,
-        (SELECT COUNT(*) FROM documents WHERE user_id = u.id AND is_archived = 0) as document_count
+        (SELECT COUNT(*) FROM documents WHERE user_id = u.id AND is_archived = 0) as document_count,
+        (SELECT COUNT(*) FROM document_attachments da JOIN documents d ON da.document_id = d.id WHERE d.user_id = u.id) as attachment_count,
+        (SELECT COALESCE(SUM(da.file_size), 0) FROM document_attachments da JOIN documents d ON da.document_id = d.id WHERE d.user_id = u.id) as storage_used
       FROM users u
       LEFT JOIN profiles p ON u.id = p.user_id
       LEFT JOIN subscriptions s ON u.id = s.user_id
@@ -141,7 +143,9 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response): Pro
         currentPeriodEnd: u.current_period_end || null,
         paymentProvider: u.payment_provider || 'DIRECT',
         familyName: u.family_name || null,
-        documentCount: u.document_count || 0
+        documentCount: u.document_count || 0,
+        attachmentCount: u.attachment_count || 0,
+        storageUsed: u.storage_used || 0
       }))
     });
   } catch (error: any) {
@@ -769,5 +773,66 @@ export async function getPublicAppUpdate(req: Request, res: Response): Promise<v
     res.json(JSON.parse(row.value));
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch app update info' });
+  }
+}
+
+/**
+ * Log a notification event for the authenticated user.
+ * Called by the client (fire-and-forget) whenever a local notification is
+ * scheduled or delivered, so the admin panel can show per-user history:
+ * when notifications went out and how many.
+ */
+export async function logNotification(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+    const { type, title, body, channel, status, documentId } = req.body || {};
+    const allowedTypes = ['reminder', 'expiry', 'system', 'promo'];
+    const allowedStatus = ['scheduled', 'delivered', 'dismissed'];
+    await dbRun(
+      `INSERT INTO notification_log (id, user_id, type, title, body, channel, status, document_id, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        uuidv4(),
+        userId,
+        allowedTypes.includes(type) ? type : 'reminder',
+        (title || '').toString().slice(0, 200),
+        (body || '').toString().slice(0, 500),
+        (channel || 'local').toString().slice(0, 20),
+        allowedStatus.includes(status) ? status : 'scheduled',
+        documentId || null,
+        new Date().toISOString()
+      ]
+    );
+    res.json({ ok: true });
+  } catch (error: any) {
+    console.error('logNotification error:', error);
+    res.status(500).json({ error: 'Failed to log notification' });
+  }
+}
+
+/**
+ * Admin: per-user notification history (when + how many).
+ */
+export async function getUserNotifications(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id;
+    const limit = Math.min(parseInt((req.query.limit as string) || '50', 10) || 50, 200);
+    const logs = await dbAll<any>(
+      `SELECT id, type, title, body, channel, status, document_id, created_at
+       FROM notification_log WHERE user_id = ? ORDER BY created_at DESC LIMIT ?`,
+      [userId, limit]
+    );
+    const countRow = await dbGet<{ count: number }>(
+      'SELECT COUNT(*) as count FROM notification_log WHERE user_id = ?',
+      [userId]
+    );
+    res.json({ notifications: logs, total: countRow?.count || 0 });
+  } catch (error: any) {
+    console.error('getUserNotifications error:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 }

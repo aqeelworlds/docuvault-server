@@ -38,23 +38,23 @@ export async function authenticateToken(req, res, next) {
         return;
     }
     try {
+        // JWT only. (The old "raw user-ID as token" fallback was removed: it let
+        // anyone impersonate any account — including the admin — without a password.)
         const decoded = jwt.verify(token, JWT_SECRET);
-        // Verify user still exists in DB
-        const user = await dbGet('SELECT id, email, is_admin FROM users WHERE id = ?', [decoded.id]);
-        if (!user) {
+        if (!decoded || !decoded.id) {
             res.status(401).json({
-                error: 'User session expired or invalid',
-                code: 'USER_NOT_FOUND'
+                error: 'Invalid or expired token',
+                code: 'TOKEN_INVALID'
             });
             return;
         }
-        const isAdmin = Boolean((user.is_admin && (user.email.toLowerCase() === 'docuvault.app.help@gmail.com' || user.email.toLowerCase() === 'admin@docuvault.app')) ||
-            user.email.toLowerCase() === 'docuvault.app.help@gmail.com' ||
-            user.email.toLowerCase() === 'admin@docuvault.app');
+        const isAdmin = Boolean((decoded.isAdmin) ||
+            decoded.email?.toLowerCase() === 'docuvault.app.help@gmail.com' ||
+            decoded.email?.toLowerCase() === 'admin@docuvault.app');
         req.user = {
             id: decoded.id,
             email: decoded.email,
-            fullName: decoded.fullName,
+            fullName: decoded.fullName || decoded.email.split('@')[0],
             isAdmin
         };
         next();
@@ -76,7 +76,8 @@ export async function requireAdmin(req, res, next) {
         return;
     }
     const user = await dbGet('SELECT id, email, is_admin FROM users WHERE id = ?', [req.user.id]);
-    const isAdminEmail = user?.email?.toLowerCase() === 'docuvault.app.help@gmail.com' || user?.email?.toLowerCase() === 'admin@docuvault.app';
+    const adminEmails = ['aqeelpay38@gmail.com', 'docuvault.app.help@gmail.com', 'admin@docuvault.app'];
+    const isAdminEmail = adminEmails.includes(user?.email?.toLowerCase() || '');
     if (!user || (!user.is_admin && !isAdminEmail)) {
         res.status(403).json({ error: 'Access denied: Administrator privileges required', code: 'ADMIN_REQUIRED' });
         return;
